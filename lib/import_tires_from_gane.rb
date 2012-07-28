@@ -19,8 +19,8 @@ class ImportTiresFromGane
     sch = ".//table[@class='result']//tr//td[@class='result_right']//a[@title='Siguiente ']"
     total = links = []
     while !str.empty?
-      page = @agent.get(str).search(".//table[@class='tableBox_output']//tr")
-      page.each do |d|
+      page = @agent.get(str)
+      page.search(".//table[@class='tableBox_output']//tr").each do |d|
         t = d.search("td[@width='900']//a").text
         r = d.search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
