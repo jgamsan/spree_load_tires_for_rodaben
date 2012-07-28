@@ -4,10 +4,6 @@ require 'csv'
 class ImportTiresFromGane
   
   def initialize()
-    @pagina = "http://galaicoasturianadeneumaticos.distritok.com/sqlcommerce/disenos/plantilla1/seccion/Catalogo.jsp?idIdioma=&idTienda=50&cPath=61"
-    @sch = ".//table[@class='result']//tr//td[@class='result_right']//a[@title='Siguiente ']"
-    @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
-    @total = @links = []
     @agent = Mechanize.new
   end
   
@@ -19,35 +15,40 @@ class ImportTiresFromGane
   end
   
   def read_from_gane
-    while !@pagina.empty?
-      page = @agent.get(@pagina)
+    str = "http://galaicoasturianadeneumaticos.distritok.com/sqlcommerce/disenos/plantilla1/seccion/Catalogo.jsp?idIdioma=&idTienda=50&cPath=61"
+    sch = ".//table[@class='result']//tr//td[@class='result_right']//a[@title='Siguiente ']"
+    total = links = []
+    while !str.empty?
+      page = @agent.get(str)
       page.search(".//table[@class='tableBox_output']//tr").each do |d|
         t = d.search("td[@width='900']//a").text
         r = d.search("td//span[@class='linCat']").map {|x| x.text}
-        if r[1] == "Consultar"
+        if r[1] == "Consultar" || r.empty?
           p = c = pf = 0
         else
+          s = r[0]
           p = r[1].to_s.delete("€").lstrip
-          c = r[2].to_s.delete("%").lstrip
+          k = r[2].to_s.delete("%").lstrip
           pf = r[3].to_s.delete("€").lstrip
           puts "Stock es #{p}. PVP final es #{pf}"
         end
-        @total << [t, p, c, pf]
+        total << [t, p, c, pf]
       end
-      @links.clear
-      page.search(@sch).each do |link|
-        @links << link[:href]
+      links.clear
+      page.search(sch).each do |link|
+        links << link[:href]
       end
-      @links = @links.uniq
-      @pagina = @links[0].to_s
-      puts @pagina
+      links = links.uniq
+      str = links[0].to_s
+      puts str
     end
   end
   
   def import_from_csv
-    CSV.open("listado-final.csv", "wb") do |row|
+    final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
+    CSV.open(@final, "wb") do |row|
       @total.each do |element|
-        row << [element]
+        row << element
       end
     end
   end
