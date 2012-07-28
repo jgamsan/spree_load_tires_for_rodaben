@@ -24,7 +24,7 @@ class ImportTiresFromGane
         t = d.search("td[@width='900']//a").text
         r = d.search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
-          if r[1] == "Consultar" ||
+          if r[1] == "Consultar"
               p = c = pf = 0
           else
             s = r[0]
