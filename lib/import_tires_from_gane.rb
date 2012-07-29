@@ -72,38 +72,40 @@ class ImportTiresFromGane
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
-      if productos.include?(row[0]) # producto existe
-        articulo = Spree::Product.find_by_name(row[0])
-        articulo.update_attributes(
-          :count_on_hand => set_stock(row[1]),
-          :cost_price => row[4],
-          :price => row[4] * 1.05 #falta de poner el precio de venta segun cliente
-        )
-        # actualizar los precios
-      else
-        result = read_format(row[0])
-        i += 1
-        # crear uno nuevo
-        product = Spree::Product.new
-        product.name = row[0]
-        product.permalink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-        product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
-        product.available_on = hoy - 1.day
-        product.count_on_hand = set_stock(row[1])
-        product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
-        product.cost_price = row[4]
-        product.tire_width_id = set_width(result)
-        product.tire_profile_id = set_profile(result)
-        product.tire_innertube_id = set_innertube(result)
-        product.tire_speed_code_id = set_speed_code(result)
-        product.tire_rf = false
-        product.tire_gr = result[6]
-        product.tire_season = set_season(result)
-        product.taxons << Spree::Taxon.find(set_catalog()) #cargar categoria
-        product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
-        if product.save!
-          puts "Creado articulo #{row[0]}"
-          j += 1
+      unless row[0].blank?
+        if productos.include?(row[0]) # producto existe
+          articulo = Spree::Product.find_by_name(row[0])
+          articulo.update_attributes(
+            :count_on_hand => set_stock(row[1]),
+            :cost_price => row[4],
+            :price => row[4] * 1.05 #falta de poner el precio de venta segun cliente
+          )
+          # actualizar los precios
+        else
+          result = read_format(row[0])
+          i += 1
+          # crear uno nuevo
+          product = Spree::Product.new
+          product.name = row[0]
+          product.permalink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
+          product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
+          product.available_on = hoy - 1.day
+          product.count_on_hand = set_stock(row[1])
+          product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
+          product.cost_price = row[4]
+          product.tire_width_id = set_width(result)
+          product.tire_profile_id = set_profile(result)
+          product.tire_innertube_id = set_innertube(result)
+          product.tire_speed_code_id = set_speed_code(result)
+          product.tire_rf = false
+          product.tire_gr = result[6]
+          product.tire_season = set_season(result)
+          product.taxons << Spree::Taxon.find(set_catalog()) #cargar categoria
+          product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
+          if product.save!
+            puts "Creado articulo #{row[0]}"
+            j += 1
+          end
         end
       end
     end
