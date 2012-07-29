@@ -11,9 +11,9 @@ class ImportTiresFromGane
     @tubes = %w(TL TT RU)
     @widths = CSV.read("#{Rails.root}/db/datas/rodaben-anchos.csv").map {|x| x[0]}
     @series = CSV.read("#{Rails.root}/db/datas/rodaben-series.csv").map {|x| x[0]}
-    @llantas = CSV.read("#{Rails.root}/db/datas/rodaven-llantas.csv").map {|x| x[0]}
-    @vel = CSV.read("#{Rails.root}/db/datas/rodaven-ivel.csv").map {|x| x[0]}
-    @marcas = CSV.read("#{Rails.root}/db/datas/rodaven-marcas.csv").map {|x| x[0]}
+    @llantas = CSV.read("#{Rails.root}/db/datas/rodaben-llantas.csv").map {|x| x[0]}
+    @vel = CSV.read("#{Rails.root}/db/datas/rodaben-ivel.csv").map {|x| x[0]}
+    @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[0]}
   end
   
   def run
