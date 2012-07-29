@@ -310,7 +310,7 @@ class ImportTiresFromGane
   
   def set_innertube(row)
     llanta = row[2]
-    llanta == "" ? llanta : @llantas.index(llanta) + 1
+    llanta == nil ? llanta : @llantas.index(llanta) + 1
   end
   
   def set_speed_code(row)
