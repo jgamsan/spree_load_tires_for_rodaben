@@ -279,7 +279,6 @@ class ImportTiresFromGane
       [ancho, serie, llanta, vel, tube, marca, false]
     else
       @no_leidos << [rueda]
-      g17 += 1
     end
   end
   
