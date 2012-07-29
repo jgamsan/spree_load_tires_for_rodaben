@@ -6,7 +6,7 @@ class ImportTiresFromGane
   def initialize()
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
-    @total = []
+    @total = @no_leidos = []
     @taxons = Spree::Taxon.where(:parent_id => 2).map {|x| x.name}
     @tubes = %w(TL TT RU)
     @widths = CSV.read("#{Rails.root}/db/datas/rodaben-anchos.csv").map {|x| x[0]}
@@ -18,8 +18,8 @@ class ImportTiresFromGane
   
   def run
     if login
-      read_from_gane
-      export_to_csv
+      #read_from_gane
+      #export_to_csv
       load_from_csv
     end
   end
@@ -278,7 +278,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      total << [row[0]]
+      @no_leidos << [row[0]]
       g17 += 1
     end
   end
