@@ -144,21 +144,12 @@ class ImportTiresFromGane
       vel = g[6].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\S+)(?:-|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\d+[A-Z]+)} #3
+    elsif rueda =~ %r{(\S+)(?:-|:)(\S+)(?:\s|:)(\D+)(?:\s|:)} #3
       g = [$1,$2,$3,$4]
       ancho = g[0]
       serie = nil
       llanta = g[1]
       tube = g[2]
-      vel = nil
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, true]
-    elsif rueda =~ %r{(\S+)(?:/|:)(\d+)(?:-|:)(\S+)(?:\s|:)(\S)} #4
-      g = [$1,$2,$3,$4]
-      ancho = g[1]
-      serie = nil
-      llanta = g[2]
-      tube = g[3]
       vel = nil
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, true]
@@ -225,15 +216,6 @@ class ImportTiresFromGane
       vel = g[5].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\S+)(?:-|:)(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #12
-      g = [$1,$2,$3,$4]
-      ancho = g[0]
-      serie = nil
-      llanta = g[1]
-      tube = g[2]
-      vel = nil
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, true]
     elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)(\D+)(?:\s|:)(\S+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #13
       g = [$1,$2,$3,$4,$5,$6,$7]
       ancho = g[0]
@@ -300,6 +282,10 @@ class ImportTiresFromGane
   
   def set_width(row)
     ancho = row[0]
+    if ancho =~ %r{(\d+)(?:/|:)(\d+)}
+      ancho_nuevo = [$1,$2]
+      ancho = ancho_nuevo[1] 
+    end
     ancho == "" ? ancho : @widths.index(ancho) + 1
   end
   
