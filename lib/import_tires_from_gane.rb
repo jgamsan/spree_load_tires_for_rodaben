@@ -324,7 +324,12 @@ class ImportTiresFromGane
   
   def set_brand(row)
     marca = row[5]
-    marca = @marcas.index(marca) + 1
+    marca = @marcas.index(marca)
+    if marca.nil?
+      31
+    else
+      marca + 1
+    end
   end
   
   def set_stock(stock)
