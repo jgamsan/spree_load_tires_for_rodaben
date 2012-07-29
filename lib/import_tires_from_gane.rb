@@ -278,7 +278,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      @no_leidos << [row[0]]
+      @no_leidos << [rueda]
       g17 += 1
     end
   end
