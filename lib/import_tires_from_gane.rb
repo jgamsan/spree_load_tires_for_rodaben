@@ -100,7 +100,7 @@ class ImportTiresFromGane
           product.tire_rf = false
           product.tire_gr = result[6]
           product.tire_season = set_season(result)
-          product.taxons << Spree::Taxon.find(set_catalog()) #cargar categoria
+          product.taxons << Spree::Taxon.find(set_catalog) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
           if product.save!
             puts "Creado articulo #{row[0]}"
@@ -335,6 +335,10 @@ class ImportTiresFromGane
     else
       stock
     end
+  end
+  
+  def set_catalog
+    3
   end
   
 end
