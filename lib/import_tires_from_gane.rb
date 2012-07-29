@@ -9,10 +9,10 @@ class ImportTiresFromGane
     @total = @no_leidos = []
     @taxons = Spree::Taxon.where(:parent_id => 2).map {|x| x.name}
     @tubes = %w(TL TT RU)
-    @widths = CSV.read("#{Rails.root}/db/datas/rodaben-anchos.csv").map {|x| x[0]}
-    @series = CSV.read("#{Rails.root}/db/datas/rodaben-series.csv").map {|x| x[0]}
-    @llantas = CSV.read("#{Rails.root}/db/datas/rodaben-llantas.csv").map {|x| x[0]}
-    @vel = CSV.read("#{Rails.root}/db/datas/rodaben-ivel.csv").map {|x| x[0]}
+    @widths = Spree::TireWidth.all.map {|x| x.name}
+    @series = Spree::TireSerial.all.map {|x| x.name}
+    @llantas = Spree::TireInnertube.all.map {|x| x.name}
+    @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[0]}
   end
   
@@ -147,6 +147,10 @@ class ImportTiresFromGane
     elsif rueda =~ %r{(\S+)(?:-|:)(\S+)(?:\s|:)(\D+)(?:\s|:)} #3
       g = [$1,$2,$3,$4]
       ancho = g[0]
+      if ancho =~ %r{(\d+)(?:/|:)(\d+)}
+        ancho_nuevo = [$1,$2]
+        ancho = ancho_nuevo[1] 
+      end
       serie = nil
       llanta = g[1]
       tube = g[2]
@@ -282,11 +286,13 @@ class ImportTiresFromGane
   
   def set_width(row)
     ancho = row[0]
-    if ancho =~ %r{(\d+)(?:/|:)(\d+)}
-      ancho_nuevo = [$1,$2]
-      ancho = ancho_nuevo[1] 
+    ancho = @widths.index(ancho)
+    if ancho.nil?
+      result = Spree::TireWidth.create(:name => ancho)
+      ancho = result.id + 1
+    else
+      ancho + 1
     end
-    ancho == "" ? ancho : @widths.index(ancho) + 1
   end
   
   def set_serial(row)
@@ -296,7 +302,14 @@ class ImportTiresFromGane
   
   def set_innertube(row)
     llanta = row[2]
-    llanta == nil ? llanta : @llantas.index(llanta) + 1
+    if llanta.nil?
+      nil
+    elsif @llantas.index(llanta).nil?
+      result = Spree::TireInnertube.create(:name => llanta)
+      llanta = result.id + 1
+    else
+      @llantas.index(llanta) + 1
+    end
   end
   
   def set_speed_code(row)
