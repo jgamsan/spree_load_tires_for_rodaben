@@ -94,7 +94,7 @@ class ImportTiresFromGane
           product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
           product.cost_price = row[4]
           product.tire_width_id = set_width(result)
-          product.tire_profile_id = set_profile(result)
+          product.tire_serial_id = set_serial(result)
           product.tire_innertube_id = set_innertube(result)
           product.tire_speed_code_id = set_speed_code(result)
           product.tire_rf = false
