@@ -116,7 +116,7 @@ class ImportTiresFromGane
       end
     end
     unless fallos.empty?
-      CSV.open("#{Rails.root}/vendor/products/listado-fallos.csv", "wb")) do |row|)
+      CSV.open("#{Rails.root}/vendor/products/listado-fallos.csv", "wb") do |row|
         fallos.each do |element|
           row << element
         end
