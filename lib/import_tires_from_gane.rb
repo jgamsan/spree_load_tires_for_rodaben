@@ -289,7 +289,7 @@ class ImportTiresFromGane
     ancho = @widths.index(ancho)
     if ancho.nil?
       result = Spree::TireWidth.create(:name => ancho)
-      ancho = result.id + 1
+      ancho = result.id
     else
       ancho + 1
     end
@@ -297,7 +297,17 @@ class ImportTiresFromGane
   
   def set_serial(row)
     serie = row[1]
-    serie == nil ? serie : @series.index(serie) + 1
+    if serie.nil?
+      return serie
+    else
+      serie = @series.index(serie)
+      if serie.nil?
+        result = Spree::TireSerial.create(:name => serie)
+        serie = result.id
+      else
+        serie + 1
+      end
+    end
   end
   
   def set_innertube(row)
@@ -306,7 +316,7 @@ class ImportTiresFromGane
       nil
     elsif @llantas.index(llanta).nil?
       result = Spree::TireInnertube.create(:name => llanta)
-      llanta = result.id + 1
+      llanta = result.id
     else
       @llantas.index(llanta) + 1
     end
