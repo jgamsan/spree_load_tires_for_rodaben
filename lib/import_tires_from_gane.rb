@@ -19,7 +19,7 @@ class ImportTiresFromGane
   def run
     if login
       read_from_gane
-      #export_to_csv
+      export_to_csv
       #load_from_csv
     end
   end
@@ -93,7 +93,7 @@ class ImportTiresFromGane
             product.available_on = hoy - 1.day
             product.count_on_hand = set_stock(row[1])
             product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
-            product.cost_price = row[4].gsub(/,/, '.').to_f
+            product.cost_price = row[4]
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
