@@ -18,9 +18,9 @@ class ImportTiresFromGane
   
   def run
     #if login
-      #read_from_gane
+      read_from_gane
       #export_to_csv
-      load_from_csv
+      #load_from_csv
     #end
   end
   
