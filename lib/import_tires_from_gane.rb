@@ -31,16 +31,16 @@ class ImportTiresFromGane
     until str.empty?
       page = @agent.get(str)
       page.search(".//table[@class='tableBox_output']//tr").each do |d|
-        t = d.search("td[@width='900']//a").text
+        t = d.search("td[@width='900']//a").text.strip
         r = d.search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
           if r[1] == "Consultar"
               p = k = pf = s = 0
           else
-            s = r[0]
-            p = r[1].to_s.delete("€").strip
-            k = r[2].to_s.delete("%").strip
-            pf = r[3].to_s.delete("€").strip
+            s = r[0].strip
+            p = r[1].to_s.delete("€").strip.gsub(/,/, '.').to_f
+            k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
+            pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
             puts "Stock es #{p}. PVP final es #{pf}"
           end
           @total << [t, s, p, k, pf]
@@ -92,7 +92,7 @@ class ImportTiresFromGane
             product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
             product.available_on = hoy - 1.day
             product.count_on_hand = set_stock(row[1])
-            product.price = row[4].gsub(/,/, '.').to_f * 1.05 #falta de poner el precio de venta segun cliente
+            product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
             product.cost_price = row[4].gsub(/,/, '.').to_f
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
