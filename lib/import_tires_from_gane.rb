@@ -106,6 +106,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
               puts "Creado articulo #{row[0]}"
+              puts "total_memory_usage_in_k = #{`ps -Ao rss=`.split.map(&:to_i).inject(&:+)}"
               j += 1
             end
             product = nil
