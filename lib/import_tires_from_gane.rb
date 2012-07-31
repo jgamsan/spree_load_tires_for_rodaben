@@ -14,6 +14,7 @@ class ImportTiresFromGane
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[0]}
+    @error = ""
   end
   
   def run
@@ -170,6 +171,15 @@ class ImportTiresFromGane
       vel = nil
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, true]
+    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:-|:)(\d+)(?:\s|:)(\S+)} #4
+      g = [$1,$2,$3,$4]
+      ancho = g[1]
+      serie = nil
+      llanta = g[2]
+      tube = nil
+      vel = g[3]
+      marca = read_taxon(rueda)
+      [ancho, serie, llanta, vel, tube, marca, true]
     elsif rueda =~ %r{(\S+)(?:\s|:)([A-Z])(?:\s|:)(\d+)(?:\s|:)([A-Z]+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #5
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
@@ -298,7 +308,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      @no_leidos << [rueda]
+      @no_leidos << [rueda, @error]
     end
   end
   
@@ -317,46 +327,40 @@ class ImportTiresFromGane
   end
   
   def set_width(row)
-    ancho = row[0]
-    ancho = @widths.index(ancho)
-    if ancho.nil?
-      result = Spree::TireWidth.create(:name => ancho)
-      ancho = result.id
-    else
-      ancho + 1
+    begin
+      ancho = row[0]
+      ancho == nil ? ancho : @widths.index(ancho) + 1
+    rescue Exception => e
+      @error = "Error en Width"
     end
   end
   
   def set_serial(row)
-    serie = row[1]
-    if serie.nil?
-      return serie
-    else
-      serie = @series.index(serie)
-      if serie.nil?
-        result = Spree::TireSerial.create(:name => serie)
-        serie = result.id
-      else
-        serie + 1
-      end
+    begin
+      serie = row[1]
+      serie == nil ? serie : @series.index(serie) + 1
+    rescue Exception => e
+      @error = "Error en Serial"
     end
   end
   
   def set_innertube(row)
-    llanta = row[2]
-    if llanta.nil?
-      nil
-    elsif @llantas.index(llanta).nil?
-      result = Spree::TireInnertube.create(:name => llanta)
-      llanta = result.id
-    else
-      @llantas.index(llanta) + 1
+    begin
+      llanta = row[2]
+      llanta == nil ? llanta : @llantas.index(llanta) + 1
+    rescue Exception => e
+      @error = "Error en Llanta"
     end
   end
   
   def set_speed_code(row)
-    vel = row[3]
-    vel == nil ? vel : @vel.index(vel) + 1
+    begin
+      vel = row[3]
+      vel == nil ? vel : @vel.index(vel) + 1
+    rescue Exception => e
+      @error = "Error en Velocidad"
+    end
+    
   end
   
   def set_season(row)
