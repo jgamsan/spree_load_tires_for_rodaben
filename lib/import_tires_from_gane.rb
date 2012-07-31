@@ -7,7 +7,6 @@ class ImportTiresFromGane
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
     @total = @no_leidos = []
-    @taxons = Spree::Taxon.where(:parent_id => 2).map {|x| x.name}
     @tubes = %w(TL TT RU)
     @widths = Spree::TireWidth.all.map {|x| x.name}
     @series = Spree::TireSerial.all.map {|x| x.name}
@@ -316,8 +315,8 @@ class ImportTiresFromGane
   
   def read_taxon(rueda)
    str = rueda.split
-   inter = str & @taxons
-   @taxons.find_index(inter[0]) 
+   inter = str & @marcas
+   @marcas.find_index(inter[0]) 
   end
   
   def read_tube(tube)
