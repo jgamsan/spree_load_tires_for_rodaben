@@ -154,7 +154,7 @@ class ImportTiresFromGane
       g = [$1,$2,$3,$4,$5,$6,$7]
       ancho = g[0]
       serie = g[1]
-      llanta = g[3]
+      llanta = g[3].scan(/[0-9]+/)[0]
       tube = g[4]
       vel = g[6].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
@@ -221,7 +221,7 @@ class ImportTiresFromGane
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
       serie = nil
-      llanta = g[2]
+      llanta = g[2].scan(/[0-9]+/)[0]
       tube = g[3]
       vel = g[5].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
