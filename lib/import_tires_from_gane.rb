@@ -112,7 +112,7 @@ class ImportTiresFromGane
         end
       rescue Exception => e
         puts e
-        fallos << [row[0]]
+        fallos << [row[0], @error]
         next
       end
     end
@@ -308,7 +308,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      @no_leidos << [rueda, @error]
+      @no_leidos << [rueda]
     end
   end
   
