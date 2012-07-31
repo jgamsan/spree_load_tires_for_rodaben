@@ -108,6 +108,7 @@ class ImportTiresFromGane
               puts "Creado articulo #{row[0]}"
               j += 1
             end
+            product = nil
           end
         end
       rescue Exception => e
