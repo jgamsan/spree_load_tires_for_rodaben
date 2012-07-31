@@ -38,9 +38,9 @@ class ImportTiresFromGane
               p = k = pf = s = 0
           else
             s = r[0]
-            p = r[1].to_s.delete("€").lstrip
-            k = r[2].to_s.delete("%").lstrip
-            pf = r[3].to_s.delete("€").lstrip
+            p = r[1].to_s.delete("€").strip
+            k = r[2].to_s.delete("%").strip
+            pf = r[3].to_s.delete("€").strip
             puts "Stock es #{p}. PVP final es #{pf}"
           end
           @total << [t, s, p, k, pf]
@@ -92,8 +92,8 @@ class ImportTiresFromGane
             product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
             product.available_on = hoy - 1.day
             product.count_on_hand = set_stock(row[1])
-            product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
-            product.cost_price = row[4]
+            product.price = row[4].gsub(/,/, '.').to_f * 1.05 #falta de poner el precio de venta segun cliente
+            product.cost_price = row[4].gsub(/,/, '.').to_f
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
@@ -328,40 +328,23 @@ class ImportTiresFromGane
   end
   
   def set_width(row)
-    begin
-      ancho = row[0]
-      ancho == nil ? ancho : @widths.index(ancho) + 1
-    rescue Exception => e
-      @error = "Error en Width"
-    end
+    ancho = row[0]
+    ancho == nil ? ancho : @widths.index(ancho) + 1
   end
   
   def set_serial(row)
-    begin
-      serie = row[1]
-      serie == nil ? serie : @series.index(serie) + 1
-    rescue Exception => e
-      @error = "Error en Serial"
-    end
+    serie = row[1]
+    serie == nil ? serie : @series.index(serie) + 1
   end
   
   def set_innertube(row)
-    begin
-      llanta = row[2]
-      llanta == nil ? llanta : @llantas.index(llanta) + 1
-    rescue Exception => e
-      @error = "Error en Llanta"
-    end
+    llanta = row[2]
+    llanta == nil ? llanta : @llantas.index(llanta) + 1
   end
   
   def set_speed_code(row)
-    begin
-      vel = row[3]
-      vel == nil ? vel : @vel.index(vel) + 1
-    rescue Exception => e
-      @error = "Error en Velocidad"
-    end
-    
+    vel = row[3]
+    vel == nil ? vel : @vel.index(vel) + 1
   end
   
   def set_season(row)
@@ -370,12 +353,7 @@ class ImportTiresFromGane
   
   def set_brand(row)
     marca = row[5]
-    marca = @marcas.index(marca)
-    if marca.nil?
-      31
-    else
-      marca + 1
-    end
+    marca + 4
   end
   
   def set_stock(stock)
