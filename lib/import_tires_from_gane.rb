@@ -13,7 +13,7 @@ class ImportTiresFromGane
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[0]}
+    @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[1]}
     @error = ""
   end
   
