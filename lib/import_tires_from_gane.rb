@@ -141,10 +141,16 @@ class ImportTiresFromGane
   
   def read_format(rueda)
     rueda = rueda.to_s
-    if rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+[A-Z])} #1
+    if rueda =~ %r{(\S+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+[A-Z])} #1
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
-      serie = g[1]
+      if ancho =~ %r{(\d+)(?:/|:)(\d+)}
+        ancho_nuevo = [$1,$2]
+        ancho = ancho_nuevo[0]
+        serie = ancho_nuevo[1]
+      else
+        serie = nil 
+      end
       llanta = g[3]
       tube = read_tube(g[4])
       vel = g[5].scan(/[A-Z]+/)[0]
@@ -203,7 +209,7 @@ class ImportTiresFromGane
       end
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+\S+)} #7
+    elsif rueda =~ %r{(\S+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+\S+)} #7
       g = [$1,$2,$3,$4,$5]
       ancho = g[0]
       serie = nil
