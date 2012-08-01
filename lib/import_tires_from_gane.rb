@@ -150,7 +150,7 @@ class ImportTiresFromGane
       vel = g[5].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #2
+    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #2
       g = [$1,$2,$3,$4,$5,$6,$7]
       ancho = g[0]
       serie = g[1]
