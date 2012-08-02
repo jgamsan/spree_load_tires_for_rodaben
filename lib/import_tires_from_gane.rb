@@ -104,8 +104,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(set_catalog) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              print "Creado articulo #{row[0]}"
-              print "\r"
+              puts "Creado articulo #{row[0]}"
               j += 1
             end
             product = nil
@@ -220,12 +219,10 @@ class ImportTiresFromGane
       llanta = nil
       tube = nil
       vel = nil
-      unless g[1].include?("PR")
-        if g[1].include?("A")
-          vel = g[1].scan(/[A]\d/)[0]
-        else
-          vel = g[1].scan(/[A-Z]+/)[0]
-        end
+      if g[1].include?("PR")
+        vel = nil
+      else
+        vel = g[1]
       end
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
@@ -307,7 +304,7 @@ class ImportTiresFromGane
     if str.include?("A")
       str.scan(/[A]\d/)[0]
     else
-      str.scan(/[A-Z]+/)[0]
+      str.scan(/[A-Z]/)[0]
     end
   end
   
