@@ -156,14 +156,7 @@ class ImportTiresFromGane
       end
       llanta = g[2].scan(/\d+/)[0]
       tube = read_tube(g[3])
-      if g[4] =~ %r{(\S+)(?:/|:)(\S+)}
-        vel_nueva = [$1,$2]
-        vel = vel_nueva[1].scan(/[A-Z]+/)[0]
-      elsif g[4] == "ZR"
-        vel = [g4]
-      else
-        vel = g[4].scan(/[A-Z]+/)[0]
-      end
+      vel = g[4]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     elsif rueda =~ %r{(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)} #3
@@ -193,21 +186,16 @@ class ImportTiresFromGane
       end
       llanta = g[2].scan(/\d+/)[0]
       tube = nil
-      if g[3] =~ %r{(\S+)(?:/|:)(\S+)}
-        vel_nueva = [$1,$2]
-        vel = vel_nueva[1].scan(/[A-Z]+/)[0]
-      else
-        vel = g[3].scan(/[A-Z]+/)[0]
-      end
+      vel = g[3]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)(\S+)} #13
+    elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)(\S+)} #13
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
       serie = nil
       llanta = g[2]
       tube = g[3]
-      vel = g[5].scan(/[A-Z]+/)[0]
+      vel = g[5]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
@@ -276,7 +264,19 @@ class ImportTiresFromGane
   end
   
   def set_speed_code(row)
-    vel = row[3]
+    str = row[3]
+    if str.nil?
+      vel = nil
+    else
+      if str =~ %r{(\S+)(?:/|:)(\S+)}
+        vel_nueva = [$1,$2]
+        vel = get_vel_code(vel_nueva[1]) 
+      elsif str == "ZR"
+        vel = str 
+      else
+        vel = get_vel_code(str)
+      end 
+    end
     vel == nil ? vel : @vel.index(vel) + 1
   end
   
@@ -301,6 +301,14 @@ class ImportTiresFromGane
   
   def set_catalog
     3
+  end
+  
+  def get_vel_code(str)
+    if str.include?("A")
+      str.scan(/[A]\d/)[0]
+    else
+      str.scan(/[A-Z]+/)[0]
+    end
   end
   
 end
