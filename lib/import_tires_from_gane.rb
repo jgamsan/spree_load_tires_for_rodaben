@@ -147,7 +147,7 @@ class ImportTiresFromGane
         ancho_nuevo = [$1,$2]
         ancho = ancho_nuevo[0]
         serie = ancho_nuevo[1]
-      elsif g[0] =~ %r{(\d+)(?:X|:)(\S+)}
+      elsif g[0] =~ %r{(\d+)(?:[Xx]|:)(\S+)}
         ancho_nuevo = [$1,$2]
         ancho = ancho_nuevo[1]
       else
@@ -234,7 +234,7 @@ class ImportTiresFromGane
   
   def read_taxon(rueda)
    str = rueda.split
-   if str.include?("GOODYEAR")
+   if str.include?("GOODYEAR") || (str.include?("GOOD") & str.include?("YEAR"))
     inter = ["GOOD YEAR"]
    else
     inter = str & @marcas
