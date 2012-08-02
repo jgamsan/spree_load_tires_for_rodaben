@@ -14,6 +14,7 @@ class ImportTiresFromGane
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[1]}
     @error = ""
+    @modificaciones = %w(GOODYEAR)
   end
   
   def run
@@ -112,7 +113,7 @@ class ImportTiresFromGane
         end
       rescue Exception => e
         puts e
-        fallos << [row[0], @error]
+        fallos << [row[0], e]
         next
       end
     end
@@ -233,15 +234,20 @@ class ImportTiresFromGane
   
   def read_taxon(rueda)
    str = rueda.split
-   inter = str & @marcas
+   if str.include?("GOODYEAR")
+    inter = ["GOOD YEAR"]
+   else
+    inter = str & @marcas
+   end
+   
    @marcas.find_index(inter[0]) 
   end
   
   def read_tube(tube)
     if tube.nil?
-      return nil
+      nil
     else
-      return @tubes.find_index(tube)
+      @tubes.find_index(tube)
     end  
   end
   
