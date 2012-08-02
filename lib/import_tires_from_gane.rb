@@ -141,177 +141,104 @@ class ImportTiresFromGane
   
   def read_format(rueda)
     rueda = rueda.to_s
-    if rueda =~ %r{(\S+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+[A-Z])} #1
+    if rueda =~ %r{(\S+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)} #1
       g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      if ancho =~ %r{(\d+)(?:/|:)(\d+)}
+      if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
+        ancho_nuevo = [$1,$2]
+        ancho = ancho_nuevo[0]
+        serie = ancho_nuevo[1]
+      elsif g[0] =~ %r{(\d+)(?:X|:)(\S+)}
+        ancho_nuevo = [$1,$2]
+        ancho = ancho_nuevo[1]
+      else
+        ancho = g[0]
+        serie = nil 
+      end
+      llanta = g[2].scan(/\d+/)[0]
+      tube = read_tube(g[3])
+      if g[4] =~ %r{(\S+)(?:/|:)(\S+)}
+        vel_nueva = [$1,$2]
+        vel = vel_nueva[1].scan(/[A-Z]+/)[0]
+      elsif g[4] == "ZR"
+        vel = [g4]
+      else
+        vel = g[4].scan(/[A-Z]+/)[0]
+      end
+      marca = read_taxon(rueda)
+      [ancho, serie, llanta, vel, tube, marca, false]
+    elsif rueda =~ %r{(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)} #3
+      g = [$1,$2,$3,$4]
+      if g[0] =~ %r{(\S+)(?:/|:)(\S+)}
+        ancho_nuevo = [$1,$2]
+        g[0] = ancho_nuevo[1]
+      end
+      g[0] =~ %r{(\S+)(?:-|:)(\S+)}
+      h = [$1,$2]
+      ancho = h[0]
+      serie = nil
+      llanta = h[1]
+      tube = g[1]
+      vel = nil
+      marca = read_taxon(rueda)
+      [ancho, serie, llanta, vel, tube, marca, true]
+    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\S+)(?:/|:)(\S+)} #11
+      g = [$1,$2,$3,$4]
+      if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
         ancho_nuevo = [$1,$2]
         ancho = ancho_nuevo[0]
         serie = ancho_nuevo[1]
       else
+        ancho = g[0]
         serie = nil 
       end
-      llanta = g[3]
-      tube = read_tube(g[4])
+      llanta = g[2].scan(/\d+/)[0]
+      tube = nil
+      if g[3] =~ %r{(\S+)(?:/|:)(\S+)}
+        vel_nueva = [$1,$2]
+        vel = vel_nueva[1].scan(/[A-Z]+/)[0]
+      else
+        vel = g[3].scan(/[A-Z]+/)[0]
+      end
+      marca = read_taxon(rueda)
+      [ancho, serie, llanta, vel, tube, marca, false]
+    elsif rueda =~ rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)(\S+)} #13
+      g = [$1,$2,$3,$4,$5,$6]
+      ancho = g[0]
+      serie = nil
+      llanta = g[2]
+      tube = g[3]
       vel = g[5].scan(/[A-Z]+/)[0]
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #2
-      g = [$1,$2,$3,$4,$5,$6,$7]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3].scan(/[0-9]+/)[0]
-      tube = g[4]
-      vel = g[6].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\S+)(?:-|:)(\S+)(?:\s|:)(\D+)(?:\s|:)} #3
-      g = [$1,$2,$3,$4]
-      ancho = g[0]
-      if ancho =~ %r{(\d+)(?:/|:)(\d+)}
+    elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
+      g = [$1,$2,$3]
+      if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
         ancho_nuevo = [$1,$2]
-        ancho = ancho_nuevo[1] 
+        g[0] = ancho_nuevo[1]
+        g[0] =~ %r{(\S+)(?:-|:)(\S+)}
+        h = [$1,$2]
+        ancho = h[0]
+        serie = nil
+        llanta = h[1]
+      elsif g[0] =~ %r{(\d+)(?:[Xx]|:)(\d+)}
+        ancho_nuevo = [$1,$2]
+        ancho = ancho_nuevo[1]
+      else
+        g[0] =~ %r{(\S+)(?:-|:)(\S+)}
+        h = [$1,$2]
+        ancho = h[0]
+        serie = nil 
       end
-      serie = nil
-      llanta = g[1]
-      tube = g[2]
-      vel = nil
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, true]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:-|:)(\d+)(?:\s|:)(\S+)} #4
-      g = [$1,$2,$3,$4]
-      ancho = g[1]
-      serie = nil
-      llanta = g[2]
-      tube = nil
-      vel = g[3]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, true]
-    elsif rueda =~ %r{(\S+)(?:\s|:)([A-Z])(?:\s|:)(\d+)(?:\s|:)([A-Z]+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #5
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = g[2]
       llanta = nil
-      tube = g[3]
-      vel = g[5].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)([A-Z]+)(?:\s|:)([A-Z]+)} #6
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3]
-      tube = g[4]
-      if g[5].size > 2
-        vel = nil
-      else
-        vel = g[5]
-      end
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\S+)(?:\s|:)(\D)(?:\s|:)(\d+)(?:\s|:)(\D+)(?:\s|:)(\d+\S+)} #7
-      g = [$1,$2,$3,$4,$5]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2]
-      tube = g[3]
-      if g[4] =~ %r{([A-Z]\d)}
-        r = [$1,$2]
-        vel = r[0]
-      else
-        vel = g[4].scan(/[A-Z]/)[0]
-      end
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #8
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2].scan(/[0-9]+/)[0]
-      tube = g[3]
-      vel = g[5].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #9
-      g = [$1,$2,$3,$4,$5,$6,$7]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3]
-      tube = g[4]
-      vel = g[6].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\S+)} #10
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3]
-      tube = g[4]
-      if g[5] =~ %r{([A-Z]\d)}
-        r = [$1,$2]
-        vel = r[0]
-      else
-        vel = g[5].scan(/[A-Z]/)[0]
-      end
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\S+)(?:/|:)(\S+)} #11
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3]
-      tube = nil
-      if g[5] =~ %r{([A-Z]\d)}
-        r = [$1,$2]
-        vel = r[0]
-      else
-        vel = g[5].scan(/[A-Z]/)[0]
-      end
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)(\D+)(?:\s|:)(\S+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #13
-      g = [$1,$2,$3,$4,$5,$6,$7]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2]
-      tube = g[3]
-      vel = g[6].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\D+)(?:\s|:)(\d+)(?:/|:)(\d+[A-Z])} #14
-      g = [$1,$2,$3,$4,$5,$6]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2]
-      tube = g[3]
-      vel = g[5].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #15
-      g = [$1,$2,$3,$4,$5]
-      ancho = g[0]
-      serie = g[1]
-      llanta = g[3]
-      tube = nil
-      vel = g[4].scan(/[A-Z]+/)[0]
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\S+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\S+)} #16
-      g = [$1,$2,$3,$4]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2]
       tube = nil
       vel = nil
-      marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
-    elsif rueda =~ %r{(\d+)(?:X|:)(\d+)} #17
-      g = [$1,$2]
-      ancho = g[0]
-      serie = nil
-      llanta = g[2]
-      tube = nil
-      vel = nil
+      unless g[1].include?("PR")
+        if g[1].include?("A")
+          vel = g[1].scan(/[A]\d/)[0]
+        else
+          vel = g[1].scan(/[A-Z]+/)[0]
+        end
+      end
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
