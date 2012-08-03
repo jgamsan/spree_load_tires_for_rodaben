@@ -161,15 +161,22 @@ class ImportTiresFromGane
       [ancho, serie, llanta, vel, tube, marca, false]
     elsif rueda =~ %r{(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)} #3
       g = [$1,$2,$3,$4]
-      if g[0] =~ %r{(\S+)(?:/|:)(\S+)}
-        ancho_nuevo = [$1,$2]
-        g[0] = ancho_nuevo[1]
+      if g[0] =~ %r{(\S+)(?:/|:)(\S+)(?:-|:)(\S+)}
+        ancho_nuevo = [$1,$2,$3]
+        if ancho_nuevo[0].to_i > 100
+          ancho = ancho_nuevo[0]
+          serie = ancho_nuevo[1]
+          llanta = ancho_nuevo[2].scan(/\d+/)[0]
+        else
+          ancho = ancho_nuevo[1]
+          llanta = ancho_nuevo[2].scan(/\d+/)[0]
+          serie = nil
+        end
+      elsif g[0] =~ %r{(\S+)(?:-|:)(\S+)}
+        h = [$1,$2]
+        ancho = h[0]
+        serie = nil 
       end
-      g[0] =~ %r{(\S+)(?:-|:)(\S+)}
-      h = [$1,$2]
-      ancho = h[0]
-      serie = nil
-      llanta = h[1]
       tube = g[1]
       vel = nil
       marca = read_taxon(rueda)
@@ -199,26 +206,26 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
-      g = [$1,$2,$3]
-      if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
-        ancho_nuevo = [$1,$2]
-        g[0] = ancho_nuevo[1]
-        g[0] =~ %r{(\S+)(?:-|:)(\S+)}
-        h = [$1,$2]
-        ancho = h[0]
-        serie = nil
-        llanta = h[1]
+      ancho_nuevo = [$1,$2,$3]
+        if ancho_nuevo[0].to_i > 100
+          ancho = ancho_nuevo[0]
+          serie = ancho_nuevo[1]
+          llanta = ancho_nuevo[2]
+        else
+          ancho = ancho_nuevo[1]
+          llanta = ancho_nuevo[2]
+          serie = nil
+        end
       elsif g[0] =~ %r{(\d+)(?:[Xx]|:)(\d+)}
         ancho_nuevo = [$1,$2]
         ancho = ancho_nuevo[1]
-      else
-        g[0] =~ %r{(\S+)(?:-|:)(\S+)}
+        serie = nil
+        llanta = nil
+      elsif g[0] =~ %r{(\S+)(?:-|:)(\S+)}
         h = [$1,$2]
         ancho = h[0]
         serie = nil 
       end
-      llanta = nil
-      tube = nil
       vel = nil
       if g[1].include?("PR")
         vel = nil
