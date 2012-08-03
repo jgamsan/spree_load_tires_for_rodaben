@@ -22,6 +22,7 @@ class ImportTiresFromGane
       #read_from_gane
       #export_to_csv
       load_from_csv
+      #delete_no_updated
     #end
   end
   
@@ -38,7 +39,7 @@ class ImportTiresFromGane
           if r[1] == "Consultar"
               p = k = pf = s = 0
           else
-            s = r[0].strip
+            s = r[0].to_s.strip
             p = r[1].to_s.delete("€").strip.gsub(/,/, '.').to_f
             k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
@@ -122,6 +123,23 @@ class ImportTiresFromGane
         fallos.each do |element|
           row << element
         end
+      end
+    end
+  end
+  
+  def delete_no_updated
+    nuevos = []
+    i = 1
+    almacenados = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
+    CSV.foreach(@final) do |row|
+      nuevos << [row[0]] 
+    end
+    eliminar = almacenados - nuevos
+    eliminar.each do |element|
+      t = Spree::Product.find_by_name(element)
+      unless t.nil?
+        t.destroy
+        i += 1
       end
     end
   end
@@ -303,9 +321,9 @@ class ImportTiresFromGane
   
   def set_stock(stock)
     if stock.include?("<")
-      stock.delete("<").to_i - 1
+      stock.delete("<").scan(/\d+/)[0].to_i - 1
     elsif stock.include?(">")
-      stock.delete(">").to_i
+      stock.delete(">").scan(/\d+/)[0].to_i
     else
       stock
     end
