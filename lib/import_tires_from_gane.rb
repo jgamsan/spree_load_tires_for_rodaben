@@ -206,7 +206,9 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
-      ancho_nuevo = [$1,$2,$3]
+      g = [$1,$2,$3]
+      if g[0] =~ %r{(\S+)(?:/|:)(\S+)(?:-|:)(\S+)}
+        ancho_nuevo = [$1,$2,$3]
         if ancho_nuevo[0].to_i > 100
           ancho = ancho_nuevo[0]
           serie = ancho_nuevo[1]
@@ -235,7 +237,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      @no_leidos << [rueda]
+      puts "No leido #{rueda}" 
     end
   end
   
