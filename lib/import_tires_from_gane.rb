@@ -12,7 +12,7 @@ class ImportTiresFromGane
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    @marcas = CSV.read("#{Rails.root}/db/datas/rodaben-marcas.csv").map {|x| x[1]}
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @error = ""
     @modificaciones = %w(GOODYEAR)
   end
@@ -21,7 +21,7 @@ class ImportTiresFromGane
     if login
       read_from_gane
       export_to_csv
-      #load_from_csv
+      load_from_csv
       #delete_no_updated
     end
   end
@@ -316,7 +316,7 @@ class ImportTiresFromGane
   
   def set_brand(row)
     marca = row[5]
-    marca + 4
+    marca + 8
   end
   
   def set_stock(stock)
