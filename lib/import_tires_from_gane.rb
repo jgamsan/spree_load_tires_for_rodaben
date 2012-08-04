@@ -325,7 +325,7 @@ class ImportTiresFromGane
     elsif stock.include?(">")
       stock.delete(">").scan(/\d+/)[0].to_i
     else
-      stock
+      stock.to_i
     end
   end
   
