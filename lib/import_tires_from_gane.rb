@@ -12,7 +12,7 @@ class ImportTiresFromGane
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
     @error = ""
     @modificaciones = %w(GOODYEAR)
   end
