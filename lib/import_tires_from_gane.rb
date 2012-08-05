@@ -94,7 +94,7 @@ class ImportTiresFromGane
             product.permalink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
             product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
             product.available_on = hoy - 1.day
-            product.count_on_hand = set_stock(row[1])
+            #product.count_on_hand = set_stock(row[1])
             product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
             product.cost_price = row[4]
             product.tire_width_id = set_width(result)
@@ -110,6 +110,9 @@ class ImportTiresFromGane
               puts "Creado articulo #{row[0]}"
               j += 1
             end
+            v = Spree::Variant.find_by_product_id(product.id)
+            v.update_column(:count_on_hand, set_stock(row[1]))
+            v.nil
             product = nil
           end
         end
