@@ -78,7 +78,8 @@ class ImportTiresFromGane
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
-            articulo.update_attributes(
+            variante = Spree::Variant.find_by_product_id(articulo.id)
+            variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
               :cost_price => row[4],
               :price => row[4] * 1.05 #falta de poner el precio de venta segun cliente
