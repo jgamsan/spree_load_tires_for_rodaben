@@ -152,7 +152,7 @@ class ImportTiresFromGane
     nuevos = []
     almacenados = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
-      nuevos << [row[0]] 
+      nuevos << row[0]
     end
     eliminar = almacenados - nuevos
     eliminar.each do |element|
@@ -166,7 +166,7 @@ class ImportTiresFromGane
   
   def send_mail
     begin
-      NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @send_file).deliver
+      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @send_file).deliver
     rescue Exception => e
       puts "Error en el envio: #{e}"
     end
