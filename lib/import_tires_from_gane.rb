@@ -23,13 +23,13 @@ class ImportTiresFromGane
   end
   
   def run
-    if login
-      read_from_gane
-      export_to_csv
+    #if login
+      #read_from_gane
+      #export_to_csv
       load_from_csv
       delete_no_updated
       send_mail
-    end
+    #end
   end
   
   def read_from_gane
