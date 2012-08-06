@@ -6,7 +6,12 @@ class ImportTiresFromGane
   def initialize()
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
-    @total = @no_leidos = []
+    @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
+    @total = @no_leidos = @horario = []
+    @created = 0
+    @updated = 0
+    @deleted = 0
+    @readed = 0
     @tubes = %w(TL TT RU)
     @widths = Spree::TireWidth.all.map {|x| x.name}
     @series = Spree::TireSerial.all.map {|x| x.name}
@@ -18,12 +23,13 @@ class ImportTiresFromGane
   end
   
   def run
-    #if login
-      #read_from_gane
-      #export_to_csv
+    if login
+      read_from_gane
+      export_to_csv
       load_from_csv
-      #delete_no_updated
-    #end
+      delete_no_updated
+      send_mail
+    end
   end
   
   def read_from_gane
@@ -46,6 +52,7 @@ class ImportTiresFromGane
             puts "Stock es #{p}. PVP final es #{pf}"
           end
           @total << [t, s, p, k, pf]
+          @readed += 1
         end
       end
       links.clear
@@ -69,7 +76,7 @@ class ImportTiresFromGane
   
   def load_from_csv
     # [ancho, serie, llanta, vel, tube, marca, gr]
-    result = fallos = []
+    result = fallos = no_leidos = []
     i = j =0
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
@@ -84,6 +91,7 @@ class ImportTiresFromGane
               :cost_price => row[4],
               :price => row[4] * 1.05 #falta de poner el precio de venta segun cliente
             )
+            @updated += 1
             # actualizar los precios
           else
             result = read_format(row[0])
@@ -112,13 +120,15 @@ class ImportTiresFromGane
             end
             v = Spree::Variant.find_by_product_id(product.id)
             v.update_column(:count_on_hand, set_stock(row[1]))
-            v.nil
+            v = nil
             product = nil
+            @created += 1
           end
         end
       rescue Exception => e
         puts e
         fallos << [row[0], e]
+        no_leidos << [row[0], row[1], row[2], row[3]]
         next
       end
     end
@@ -129,11 +139,17 @@ class ImportTiresFromGane
         end
       end
     end
+    unless no_leidos.empty?
+      CSV.open(@send_file, "wb") do |row|
+        no_leidos.each do |element|
+          row << element
+        end
+      end
+    end
   end
   
   def delete_no_updated
     nuevos = []
-    i = 1
     almacenados = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
       nuevos << [row[0]] 
@@ -143,8 +159,16 @@ class ImportTiresFromGane
       t = Spree::Product.find_by_name(element)
       unless t.nil?
         t.destroy
-        i += 1
+        @deleted += 1
       end
+    end
+  end
+  
+  def send_mail
+    begin
+      NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @send_file).deliver
+    rescue Exception => e
+      puts "Error en el envio: #{e}"
     end
   end
   
