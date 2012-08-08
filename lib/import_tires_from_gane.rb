@@ -53,7 +53,7 @@ class ImportTiresFromGane
             p = r[1].to_s.delete("€").strip.gsub(/,/, '.').to_f
             k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
-            puts "Stock es #{p}. PVP final es #{pf}"
+            #puts "Stock es #{p}. PVP final es #{pf}"
           end
           @total << [t, s, p, k, pf]
           @readed += 1
