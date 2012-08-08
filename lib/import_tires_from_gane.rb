@@ -19,7 +19,9 @@ class ImportTiresFromGane
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
+    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
+    @taxons = Hash[*t]
     @error = ""
     @modificaciones = %w(GOODYEAR)
   end
@@ -63,7 +65,7 @@ class ImportTiresFromGane
       end
       links = links.uniq
       str = links[0].to_s
-      puts str
+      #puts str
     end
   end
   
@@ -130,7 +132,7 @@ class ImportTiresFromGane
           end
         end
       rescue Exception => e
-        puts e
+        #puts e
         fallos << [row[0], e]
         no_leidos << [row[0], row[1], row[2], row[3]]
         next
@@ -172,7 +174,7 @@ class ImportTiresFromGane
     begin
       Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created).deliver
     rescue Exception => e
-      puts "Error en el envio: #{e}"
+      #puts "Error en el envio: #{e}"
     end
   end
   
@@ -299,7 +301,9 @@ class ImportTiresFromGane
     inter = str & @marcas
    end
    
-   @marcas.find_index(inter[0]) 
+   @taxons.fetch(inter[0])
+   #@marcas.find_index(inter[0])
+   
   end
   
   def read_tube(tube)
@@ -348,7 +352,6 @@ class ImportTiresFromGane
   
   def set_brand(row)
     marca = row[5]
-    marca + 8
   end
   
   def set_stock(stock)
