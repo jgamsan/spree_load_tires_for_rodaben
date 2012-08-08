@@ -7,7 +7,9 @@ class ImportTiresFromGane
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
     @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
-    @total = @no_leidos = @horario = []
+    @total = []
+    @no_leidos = []
+    @horario = []
     @created = 0
     @updated = 0
     @deleted = 0
@@ -76,7 +78,9 @@ class ImportTiresFromGane
   
   def load_from_csv
     # [ancho, serie, llanta, vel, tube, marca, gr]
-    result = fallos = no_leidos = []
+    result = []
+    fallos = []
+    no_leidos = []
     i = j =0
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
@@ -166,7 +170,7 @@ class ImportTiresFromGane
   
   def send_mail
     begin
-      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @send_file).deliver
+      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created).deliver
     rescue Exception => e
       puts "Error en el envio: #{e}"
     end
