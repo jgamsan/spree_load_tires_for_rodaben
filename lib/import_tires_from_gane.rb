@@ -121,7 +121,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(set_catalog) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              puts "Creado articulo #{row[0]}"
+              #puts "Creado articulo #{row[0]}"
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
@@ -134,7 +134,7 @@ class ImportTiresFromGane
       rescue Exception => e
         #puts e
         fallos << [row[0], e]
-        no_leidos << [row[0], row[1], row[2], row[3]]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4]]
         next
       end
     end
@@ -146,7 +146,8 @@ class ImportTiresFromGane
       end
     end
     unless no_leidos.empty?
-      CSV.open(@send_file, "wb") do |row|
+      headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final"]
+      CSV.open(@send_file, "wb", {hedaers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
@@ -156,7 +157,8 @@ class ImportTiresFromGane
   
   def delete_no_updated
     nuevos = []
-    almacenados = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
+    total = Spree::Product.all
+    almacenados = total.map {|x| x.name}
     CSV.foreach(@final) do |row|
       nuevos << row[0]
     end
@@ -374,6 +376,14 @@ class ImportTiresFromGane
     else
       str.scan(/[A-Z]/)[0]
     end
+  end
+  
+  def read_image
+    
+  end
+  
+  def set_image
+    
   end
   
 end
