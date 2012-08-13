@@ -147,7 +147,7 @@ class ImportTiresFromGane
     end
     unless no_leidos.empty?
       headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final"]
-      CSV.open(@send_file, "wb", {hedaers: headers_row, write_headers: true}) do |row|
+      CSV.open(@send_file, "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
