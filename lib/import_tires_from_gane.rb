@@ -29,13 +29,13 @@ class ImportTiresFromGane
   end
 
   def run
-    if login
-      read_from_gane
-      export_to_csv
-      #load_from_csv
-      #delete_no_updated
-      #send_mail
-    end
+    #if login
+      #read_from_gane
+      #export_to_csv
+      load_from_csv
+      delete_no_updated
+      send_mail
+    #end
   end
 
   def read_from_gane
@@ -111,7 +111,7 @@ class ImportTiresFromGane
             product = Spree::Product.new
             product.name = row[0]
             product.permalink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-            product.sku = hoy.year.to_s + hoy.month.to_s + hoy.day.to_s + "-" + i.to_s
+            product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
             product.available_on = hoy - 1.day
             #product.count_on_hand = set_stock(row[1])
             product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
