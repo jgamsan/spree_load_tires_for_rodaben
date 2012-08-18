@@ -34,7 +34,7 @@ class ImportTiresFromGane
       #load_from_csv
       #delete_no_updated
       send_mail
-    end
+    #end
   end
 
   def read_from_gane
