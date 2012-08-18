@@ -7,6 +7,7 @@ class ImportTiresFromGane
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
     @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
+    @image_wd = "#{Rails.root}/vendor/products/images"
     @total = []
     @no_leidos = []
     @horario = []
@@ -28,13 +29,13 @@ class ImportTiresFromGane
   end
 
   def run
-    #if login
-     # read_from_gane
-      #export_to_csv
+    if login
+      read_from_gane
+      export_to_csv
       #load_from_csv
       #delete_no_updated
-      send_mail
-    #end
+      #send_mail
+    end
   end
 
   def read_from_gane
@@ -44,7 +45,9 @@ class ImportTiresFromGane
     until str.empty?
       page = @agent.get(str)
       page.search(".//table[@class='tableBox_output']//tr").each do |d|
-        t = d.search("td[@width='900']//a").text.strip
+        ti = d.search("td[@width='900']//a")
+        t = ti.text.strip
+        l = ti.map {|x| x[:href]}
         r = d.search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
           if r[1] == "Consultar"
@@ -54,9 +57,10 @@ class ImportTiresFromGane
             p = r[1].to_s.delete("€").strip.gsub(/,/, '.').to_f
             k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
+            img = read_image(l)
             #puts "Stock es #{p}. PVP final es #{pf}"
           end
-          @total << [t, s, p, k, pf]
+          @total << [t, s, p, k, pf, img]
           @readed += 1
         end
       end
@@ -127,6 +131,9 @@ class ImportTiresFromGane
             end
             v = Spree::Variant.find_by_product_id(product.id)
             v.update_column(:count_on_hand, set_stock(row[1]))
+            unless row[5].nil?
+              add_image(product, row[5])
+            end
             v = nil
             product = nil
             @created += 1
@@ -147,7 +154,7 @@ class ImportTiresFromGane
       end
     end
     unless no_leidos.empty?
-      headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final"]
+      headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen"]
       CSV.open(@send_file, "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
@@ -385,23 +392,30 @@ class ImportTiresFromGane
       page1 = agent.get(ln).search(".//table[@id='tablaFotograf']//tr")
       page1.each do |m|
         l1 = m.search("td//img[@id='imagenProducto']").map {|x| x[:src]}
-        puts l1
         b = l1[0]
         d = File.basename(b)
-        unless d == "0_articulosinfoto.jpg"
+        if d == "0_articulosinfoto.jpg"
+          return nil
+        else
           Net::HTTP.start("galaicoasturianadeneumaticos.distritok.com") { |http|
             resp = http.get(b)
             open(d, "wb") { |file|
               file.write(resp.body)
             }
           }
+          FileUtils.mv(d, @image_wd)
+          puts "Descargada imagen #{d}"
+          return d
         end
       end
     end
   end
 
-  def save_image
-
+  def add_image(product, file)
+    type = file.split(".").last
+    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(@image_wd + file, "image/#{type}"))
+    i.viewable = product.master
+    i.save
   end
 
 end
