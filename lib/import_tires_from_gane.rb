@@ -389,7 +389,7 @@ class ImportTiresFromGane
 
   def read_image(links)
     links.each do |ln|
-      page1 = agent.get(ln).search(".//table[@id='tablaFotograf']//tr")
+      page1 = @agent.get(ln).search(".//table[@id='tablaFotograf']//tr")
       page1.each do |m|
         l1 = m.search("td//img[@id='imagenProducto']").map {|x| x[:src]}
         b = l1[0]
