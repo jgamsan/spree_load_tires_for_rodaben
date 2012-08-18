@@ -2,7 +2,7 @@
 require 'csv'
 
 class ImportTiresFromGane
-  
+
   def initialize()
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
@@ -24,18 +24,19 @@ class ImportTiresFromGane
     @taxons = Hash[*t]
     @error = ""
     @modificaciones = %w(GOODYEAR)
+    I18n.locale = 'es'
   end
-  
+
   def run
-    if login
-      read_from_gane
-      export_to_csv
-      load_from_csv
-      delete_no_updated
+    #if login
+     # read_from_gane
+      #export_to_csv
+      #load_from_csv
+      #delete_no_updated
       send_mail
     end
   end
-  
+
   def read_from_gane
     str = "http://galaicoasturianadeneumaticos.distritok.com/sqlcommerce/disenos/plantilla1/seccion/Catalogo.jsp?idIdioma=&idTienda=50&cPath=61"
     sch = ".//table[@class='result']//tr//td[@class='result_right']//a[@title='Siguiente ']"
@@ -68,7 +69,7 @@ class ImportTiresFromGane
       #puts str
     end
   end
-  
+
   def export_to_csv
     CSV.open(@final, "wb") do |row|
       @total.each do |element|
@@ -77,7 +78,7 @@ class ImportTiresFromGane
       end
     end
   end
-  
+
   def load_from_csv
     # [ancho, serie, llanta, vel, tube, marca, gr]
     result = []
@@ -154,7 +155,7 @@ class ImportTiresFromGane
       end
     end
   end
-  
+
   def delete_no_updated
     nuevos = []
     total = Spree::Product.all
@@ -171,17 +172,18 @@ class ImportTiresFromGane
       end
     end
   end
-  
+
   def send_mail
     begin
       Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created).deliver
     rescue Exception => e
-      #puts "Error en el envio: #{e}"
+      logger.error("#{e.class.name}: #{e.message}")
+      logger.error(e.backtrace * "\n")
     end
   end
-  
+
   private
-  
+
   def login
     login = '929'
     password = 'B36973667'
@@ -192,7 +194,7 @@ class ImportTiresFromGane
     gane_form.password = password
     gane_form.submit
   end
-  
+
   def read_format(rueda)
     rueda = rueda.to_s
     if rueda =~ %r{(\S+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)} #1
@@ -206,7 +208,7 @@ class ImportTiresFromGane
         ancho = ancho_nuevo[1]
       else
         ancho = g[0]
-        serie = nil 
+        serie = nil
       end
       llanta = g[2].scan(/\d+/)[0]
       tube = read_tube(g[3])
@@ -229,7 +231,7 @@ class ImportTiresFromGane
       elsif g[0] =~ %r{(\S+)(?:-|:)(\S+)}
         h = [$1,$2]
         ancho = h[0]
-        serie = nil 
+        serie = nil
       end
       tube = g[1]
       vel = nil
@@ -243,7 +245,7 @@ class ImportTiresFromGane
         serie = ancho_nuevo[1]
       else
         ancho = g[0]
-        serie = nil 
+        serie = nil
       end
       llanta = g[2].scan(/\d+/)[0]
       tube = nil
@@ -280,7 +282,7 @@ class ImportTiresFromGane
       elsif g[0] =~ %r{(\S+)(?:-|:)(\S+)}
         h = [$1,$2]
         ancho = h[0]
-        serie = nil 
+        serie = nil
       end
       vel = nil
       if g[1].include?("PR")
@@ -291,10 +293,10 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, false]
     else
-      puts "No leido #{rueda}" 
+      puts "No leido #{rueda}"
     end
   end
-  
+
   def read_taxon(rueda)
    str = rueda.split
    if str.include?("GOODYEAR") || (str.include?("GOOD") & str.include?("YEAR"))
@@ -302,35 +304,35 @@ class ImportTiresFromGane
    else
     inter = str & @marcas
    end
-   
+
    @taxons.fetch(inter[0])
    #@marcas.find_index(inter[0])
-   
+
   end
-  
+
   def read_tube(tube)
     if tube.nil?
       nil
     else
       @tubes.find_index(tube)
-    end  
+    end
   end
-  
+
   def set_width(row)
     ancho = row[0]
     ancho == nil ? ancho : @widths.index(ancho) + 1
   end
-  
+
   def set_serial(row)
     serie = row[1]
     serie == nil ? serie : @series.index(serie) + 1
   end
-  
+
   def set_innertube(row)
     llanta = row[2]
     llanta == nil ? llanta : @llantas.index(llanta) + 1
   end
-  
+
   def set_speed_code(row)
     str = row[3]
     if str.nil?
@@ -338,24 +340,24 @@ class ImportTiresFromGane
     else
       if str =~ %r{(\S+)(?:/|:)(\S+)}
         vel_nueva = [$1,$2]
-        vel = get_vel_code(vel_nueva[1]) 
+        vel = get_vel_code(vel_nueva[1])
       elsif str == "ZR"
-        vel = str 
+        vel = str
       else
         vel = get_vel_code(str)
-      end 
+      end
     end
     vel == nil ? vel : @vel.index(vel) + 1
   end
-  
+
   def set_season(row)
     3
   end
-  
+
   def set_brand(row)
     marca = row[5]
   end
-  
+
   def set_stock(stock)
     if stock.include?("<")
       stock.delete("<").scan(/\d+/)[0].to_i - 1
@@ -365,11 +367,11 @@ class ImportTiresFromGane
       stock.to_i
     end
   end
-  
+
   def set_catalog
     3
   end
-  
+
   def get_vel_code(str)
     if str.include?("A")
       str.scan(/[A]\d/)[0]
@@ -377,13 +379,29 @@ class ImportTiresFromGane
       str.scan(/[A-Z]/)[0]
     end
   end
-  
-  def read_image
-    
+
+  def read_image(links)
+    links.each do |ln|
+      page1 = agent.get(ln).search(".//table[@id='tablaFotograf']//tr")
+      page1.each do |m|
+        l1 = m.search("td//img[@id='imagenProducto']").map {|x| x[:src]}
+        puts l1
+        b = l1[0]
+        d = File.basename(b)
+        unless d == "0_articulosinfoto.jpg"
+          Net::HTTP.start("galaicoasturianadeneumaticos.distritok.com") { |http|
+            resp = http.get(b)
+            open(d, "wb") { |file|
+              file.write(resp.body)
+            }
+          }
+        end
+      end
+    end
   end
-  
-  def set_image
-    
+
+  def save_image
+
   end
-  
+
 end
