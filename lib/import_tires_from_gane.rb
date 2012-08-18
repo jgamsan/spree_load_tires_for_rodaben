@@ -7,7 +7,7 @@ class ImportTiresFromGane
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
     @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
-    @image_wd = "#{Rails.root}/vendor/products/images"
+    @image_wd = "#{Rails.root}/vendor/products/images/"
     @total = []
     @no_leidos = []
     @horario = []
@@ -142,7 +142,7 @@ class ImportTiresFromGane
       rescue Exception => e
         #puts e
         fallos << [row[0], e]
-        no_leidos << [row[0], row[1], row[2], row[3], row[4]]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
         next
       end
     end
