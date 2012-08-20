@@ -8,6 +8,8 @@ class ImportTiresFromGane
     @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
     @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
+    @default_wd = "#{Rails.root}/app/assets/images/"
+    @default_img = "default.png"
     @total = []
     @no_leidos = []
     @horario = []
@@ -131,8 +133,10 @@ class ImportTiresFromGane
             end
             v = Spree::Variant.find_by_product_id(product.id)
             v.update_column(:count_on_hand, set_stock(row[1]))
-            unless row[5].nil?
-              add_image(product, row[5])
+            if row[5].nil?
+              add_image(product, @default_wd, @default_img)
+            else
+              add_image(product, @image_wd, row[5])
             end
             v = nil
             product = nil
@@ -411,9 +415,9 @@ class ImportTiresFromGane
     end
   end
 
-  def add_image(product, file)
+  def add_image(product, dir, file)
     type = file.split(".").last
-    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(@image_wd + file, "image/#{type}"))
+    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
     i.viewable = product.master
     i.save
   end
