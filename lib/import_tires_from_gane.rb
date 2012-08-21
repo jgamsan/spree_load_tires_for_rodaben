@@ -90,7 +90,7 @@ class ImportTiresFromGane
     result = []
     fallos = []
     no_leidos = []
-    i = j =0
+    i = j = 0
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
@@ -102,7 +102,8 @@ class ImportTiresFromGane
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
               :cost_price => row[4],
-              :price => row[4] * 1.05 #falta de poner el precio de venta segun cliente
+              :price => row[4] * 1.05,
+              :price_in_offert => row[2] * 1.05 #falta de poner el precio de venta segun cliente
             )
             @updated += 1
             # actualizar los precios
@@ -118,6 +119,7 @@ class ImportTiresFromGane
             #product.count_on_hand = set_stock(row[1])
             product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
             product.cost_price = row[4]
+            product.price_in_offert = row[2] * 1.05
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
@@ -225,7 +227,7 @@ class ImportTiresFromGane
       tube = read_tube(g[3])
       vel = g[4]
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
+      [ancho, serie, llanta, vel, tube, marca, set_catalog(g)]
     elsif rueda =~ %r{(\S+)(?:\s|:)([TLRU]{2})(?:\s|:)} #3
       g = [$1,$2,$3,$4]
       if g[0] =~ %r{(\S+)(?:/|:)(\S+)(?:-|:)(\S+)}
@@ -247,7 +249,7 @@ class ImportTiresFromGane
       tube = g[1]
       vel = nil
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, true]
+      [ancho, serie, llanta, vel, tube, marca, 5]
     elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\S+)(?:/|:)(\S+)} #11
       g = [$1,$2,$3,$4]
       if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
@@ -379,8 +381,16 @@ class ImportTiresFromGane
     end
   end
 
-  def set_catalog
-    3
+  def set_catalog(catalog)
+    f1 = catalog[3].scan(/\D+/)[0]
+    unless f1.nil?
+      case f1
+        when "C"
+          2
+        when "CP"
+          3
+      end
+    end
   end
 
   def get_vel_code(str)
