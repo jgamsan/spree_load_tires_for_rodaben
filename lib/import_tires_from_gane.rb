@@ -99,7 +99,7 @@ class ImportTiresFromGane
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
             if row[3].to_f > 0
-              articulo.update_column(show_in_offer, true)
+              articulo.update_column(show_in_offert, true)
             end
             variante = Spree::Variant.find_by_product_id(articulo.id)
             variante.update_attributes(
@@ -123,7 +123,7 @@ class ImportTiresFromGane
             product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
             product.cost_price = row[4]
             product.price_in_offert = row[2] * 1.05
-            product.show_in_offer = row[3].to_f > 0 ? true : false
+            product.show_in_offert = row[3].to_f > 0 ? true : false
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
