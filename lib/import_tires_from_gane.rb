@@ -31,13 +31,13 @@ class ImportTiresFromGane
   end
 
   def run
-    #if login
-      #read_from_gane
-      #export_to_csv
+    if login
+      read_from_gane
+      export_to_csv
       load_from_csv
       delete_no_updated
       send_mail
-    #end
+    end
   end
 
   def read_from_gane
@@ -134,7 +134,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              puts "Creado articulo #{row[0]}"
+              #puts "Creado articulo #{row[0]}"
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
