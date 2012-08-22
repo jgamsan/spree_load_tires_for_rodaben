@@ -31,13 +31,13 @@ class ImportTiresFromGane
   end
 
   def run
-    if login
-      read_from_gane
-      export_to_csv
+    #if login
+      #read_from_gane
+      #export_to_csv
       load_from_csv
       delete_no_updated
       send_mail
-    end
+    #end
   end
 
   def read_from_gane
@@ -98,7 +98,7 @@ class ImportTiresFromGane
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
-            if (row[3]) > 0
+            if row[3] > 0
               articulo.update_column(show_in_offer, true)
             end
             variante = Spree::Variant.find_by_product_id(articulo.id)
@@ -422,7 +422,7 @@ class ImportTiresFromGane
             }
           }
           FileUtils.mv(d, @image_wd)
-          puts "Descargada imagen #{d}"
+          #puts "Descargada imagen #{d}"
           return d
         end
       end
