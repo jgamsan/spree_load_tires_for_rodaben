@@ -393,6 +393,8 @@ class ImportTiresFromGane
           7
         when "CP"
           9
+        else
+          6
       end
     end
   end
