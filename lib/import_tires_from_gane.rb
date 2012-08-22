@@ -94,7 +94,7 @@ class ImportTiresFromGane
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
-      begin
+      #begin
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
@@ -149,12 +149,12 @@ class ImportTiresFromGane
             @created += 1
           end
         end
-      rescue Exception => e
+      #rescue Exception => e
         #puts e
-        fallos << [row[0], e]
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
-        next
-      end
+        #fallos << [row[0], e]
+        #no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
+        #next
+      #end
     end
     unless fallos.empty?
       CSV.open("#{Rails.root}/vendor/products/listado-fallos.csv", "wb") do |row|
