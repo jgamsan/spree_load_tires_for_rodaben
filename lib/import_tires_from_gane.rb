@@ -94,7 +94,7 @@ class ImportTiresFromGane
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
     CSV.foreach(@final) do |row|
-      #begin
+      begin
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
@@ -131,10 +131,10 @@ class ImportTiresFromGane
             product.tire_rf = false
             product.tire_gr = result[6]
             product.tire_season = set_season(result)
-            product.taxons << Spree::Taxon.find(set_catalog) #cargar categoria
+            product.taxons << Spree::Taxon.find(row[5]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              #puts "Creado articulo #{row[0]}"
+              puts "Creado articulo #{row[0]}"
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
@@ -149,12 +149,12 @@ class ImportTiresFromGane
             @created += 1
           end
         end
-      #rescue Exception => e
+      rescue Exception => e
         #puts e
-        #fallos << [row[0], e]
-        #no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
-        #next
-      #end
+        fallos << [row[0], e]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
+        next
+      end
     end
     unless fallos.empty?
       CSV.open("#{Rails.root}/vendor/products/listado-fallos.csv", "wb") do |row|
@@ -253,7 +253,7 @@ class ImportTiresFromGane
       tube = g[1]
       vel = nil
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, 5]
+      [ancho, serie, llanta, vel, tube, marca, 8]
     elsif rueda =~ %r{(\d+)(?:/|:)(\d+)(?:\s|:)(\D)(?:\s|:)(\S+)(?:\s|:)(\S+)(?:/|:)(\S+)} #11
       g = [$1,$2,$3,$4]
       if g[0] =~ %r{(\d+)(?:/|:)(\d+)}
@@ -268,7 +268,7 @@ class ImportTiresFromGane
       tube = nil
       vel = g[3]
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, 1]
+      [ancho, serie, llanta, vel, tube, marca, 6]
     elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)(\S+)} #13
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
@@ -277,7 +277,7 @@ class ImportTiresFromGane
       tube = g[3]
       vel = g[5]
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, 1]
+      [ancho, serie, llanta, vel, tube, marca, 6]
     elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
       g = [$1,$2,$3]
       if g[0] =~ %r{(\S+)(?:/|:)(\S+)(?:-|:)(\S+)}
@@ -308,7 +308,7 @@ class ImportTiresFromGane
         vel = g[1]
       end
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, 1]
+      [ancho, serie, llanta, vel, tube, marca, 6]
     else
       puts "No leido #{rueda}"
     end
@@ -390,9 +390,9 @@ class ImportTiresFromGane
     unless f1.nil?
       case f1
         when "C"
-          2
+          7
         when "CP"
-          3
+          9
       end
     end
   end
