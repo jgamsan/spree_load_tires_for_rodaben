@@ -268,7 +268,7 @@ class ImportTiresFromGane
       tube = nil
       vel = g[3]
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
+      [ancho, serie, llanta, vel, tube, marca, 1]
     elsif rueda =~ %r{(\d+)(?:\s|:)(\D)(?:\s|:)(\d+[A-Z])(?:\s|:)([TLRU]{2})(?:\s|:)(\S+)(?:\s|:)(\S+)} #13
       g = [$1,$2,$3,$4,$5,$6]
       ancho = g[0]
@@ -277,7 +277,7 @@ class ImportTiresFromGane
       tube = g[3]
       vel = g[5]
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
+      [ancho, serie, llanta, vel, tube, marca, 1]
     elsif rueda =~ %r{(\S+)(?:\s|:)(\S+)(?:\s|:)(\S+)} #4
       g = [$1,$2,$3]
       if g[0] =~ %r{(\S+)(?:/|:)(\S+)(?:-|:)(\S+)}
@@ -308,7 +308,7 @@ class ImportTiresFromGane
         vel = g[1]
       end
       marca = read_taxon(rueda)
-      [ancho, serie, llanta, vel, tube, marca, false]
+      [ancho, serie, llanta, vel, tube, marca, 1]
     else
       puts "No leido #{rueda}"
     end
