@@ -27,6 +27,7 @@ class ImportTiresFromGane
     @taxons = Hash[*t]
     @error = ""
     @modificaciones = %w(GOODYEAR)
+    @invierno = %w(WINTER SNOW RAIN)
     I18n.locale = 'es'
   end
 
@@ -98,9 +99,7 @@ class ImportTiresFromGane
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
-            if row[3].to_f > 0
-              articulo.update_column(:show_in_offert, true)
-            end
+            articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
@@ -130,7 +129,7 @@ class ImportTiresFromGane
             product.tire_speed_code_id = set_speed_code(result)
             product.tire_rf = false
             product.tire_gr = result[6]
-            product.tire_season = set_season(result)
+            product.tire_season = set_season(row[0])
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
@@ -367,8 +366,14 @@ class ImportTiresFromGane
     vel == nil ? vel : @vel.index(vel) + 1
   end
 
-  def set_season(row)
-    3
+  def set_season(name)
+    existe = 2
+    @invierno.each do |element|
+      if name.include?(element)
+        existe = 1
+      end
+    end
+    return existe
   end
 
   def set_brand(row)
