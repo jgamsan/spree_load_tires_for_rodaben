@@ -5,7 +5,7 @@ class ImportTiresFromEurotyres
   def initialize()
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos-eurotyre.csv"
-    #@send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
+    @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados-eurotyre.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -20,8 +20,6 @@ class ImportTiresFromEurotyres
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
-    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
     @marcas_eurotyre = CSV.read("listado-marcas-eurotyre.csv").flatten
     @taxons = Hash[*t]
     I18n.locale = 'es'
@@ -139,6 +137,21 @@ class ImportTiresFromEurotyres
         fallos << [row[0], e]
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
         next
+      end
+    end
+    unless fallos.empty?
+      CSV.open("#{Rails.root}/vendor/products/listado-fallos-eurotyre.csv", "wb") do |row|
+        fallos.each do |element|
+          row << element
+        end
+      end
+    end
+    unless no_leidos.empty?
+      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
+      CSV.open(@send_file, "wb", {headers: headers_row, write_headers: true}) do |row|
+        no_leidos.each do |element|
+          row << element
+        end
       end
     end
   end
