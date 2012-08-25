@@ -2,6 +2,7 @@
 require 'csv'
 
 class ImportTiresFromEurotyre
+
   def initialize()
     @agent = Mechanize.new
     @final = "#{Rails.root}/vendor/products/listado-neumaticos-eurotyre.csv"
