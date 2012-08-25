@@ -21,7 +21,6 @@ class ImportTiresFromEurotyre
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").flatten
-    @taxons = Hash[*t]
     I18n.locale = 'es'
   end
 
