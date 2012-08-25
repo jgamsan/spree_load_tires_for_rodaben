@@ -47,7 +47,7 @@ class ImportTiresFromEurotyre
 
   def read_from_eurotyre
     str = "http://www.eurotyre.pt/shop/shop"
-    page = agent.get(str)
+    page = @agent.get(str)
     ruedas = []
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
