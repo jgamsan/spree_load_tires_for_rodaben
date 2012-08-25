@@ -40,8 +40,8 @@ class ImportTiresFromEurotyre
     direccion = 'http://www.eurotyre.pt/shop/login'
     page = @agent.get(direccion)
     etyre_form = page.form('login')
-    etyre_form_form.username = login
-    etyre_form_form.passwd = password
+    etyre_form.username = login
+    etyre_form.passwd = password
     etyre_form.submit
   end
 
