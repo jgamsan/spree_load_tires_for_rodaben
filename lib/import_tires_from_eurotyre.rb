@@ -42,7 +42,7 @@ class ImportTiresFromEurotyre
     etyre_form = page.form('loginform')
     etyre_form.username = login
     etyre_form.passwd = password
-    etyre_form.submit
+    page = etyre_form.submit
   end
 
   def read_from_eurotyre(page)
