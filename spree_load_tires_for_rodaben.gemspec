@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
   s.requirements << 'none'
 
   s.add_dependency 'spree_core', '~> 1.1.2'
+  s.add_dependency 'mechanize'
 
 end

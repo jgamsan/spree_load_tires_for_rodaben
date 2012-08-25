@@ -1,6 +1,5 @@
 # encoding: UTF-8
 require 'csv'
-require 'mechanize'
 
 class ImportTiresFromEurotyre
 
@@ -38,10 +37,10 @@ class ImportTiresFromEurotyre
 
   def login
     page = @agent.get('http://www.eurotyre.pt/shop/login')
-    etyre_form = page.form('loginform')
-    etyre_form.username = 'nrodaben@yahoo.es'
-    etyre_form.passwd = 'jose1222'
-    page = etyre_form.submit
+    eurotyre_form = page.form('loginform')
+    eurotyre_form.username = 'nrodaben@yahoo.es'
+    eurotyre_form.passwd = 'jose1222'
+    page = eurotyre_form.submit
   end
 
   def read_from_eurotyre(page)
