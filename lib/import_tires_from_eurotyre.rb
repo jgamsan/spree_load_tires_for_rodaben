@@ -50,6 +50,7 @@ class ImportTiresFromEurotyre
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
     @marcas_eurotyre.each do |marca|
+      puts "descargando #{marca}"
       select_list.value = [marca]
       page2 = form.submit
       #puts marca
