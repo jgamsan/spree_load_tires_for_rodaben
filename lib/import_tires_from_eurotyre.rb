@@ -27,7 +27,7 @@ class ImportTiresFromEurotyre
 
   def run
     if login
-      read_from_eurotyre(login)
+      read_from_eurotyre
       export_to_csv
       load_from_csv
       delete_no_updated
@@ -40,12 +40,12 @@ class ImportTiresFromEurotyre
     eurotyre_form = page.form('loginform')
     eurotyre_form.username = 'nrodaben@yahoo.es'
     eurotyre_form.passwd = 'jose1222'
-    page = eurotyre_form.submit
+    eurotyre_form.submit
   end
 
-  def read_from_eurotyre(page)
-    #str = "http://www.eurotyre.pt/shop/shop"
-    #page = @agent.get(str)
+  def read_from_eurotyre
+    str = "http://www.eurotyre.pt/shop/shop"
+    page = @agent.get(str)
     ruedas = []
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
