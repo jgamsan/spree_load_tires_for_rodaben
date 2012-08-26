@@ -138,7 +138,7 @@ class ImportTiresFromEurotyre
         end
       rescue Exception => e
         #puts e
-        fallos << [row[0], e]
+        fallos << [row[6], e]
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
         next
       end
