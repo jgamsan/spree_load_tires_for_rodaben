@@ -26,13 +26,13 @@ class ImportTiresFromEurotyre
   end
 
   def run
-    if login
-      read_from_eurotyre
-      export_to_csv
+    #if login
+      #read_from_eurotyre
+      #export_to_csv
       load_from_csv
       delete_no_updated
       send_mail
-    end
+    #end
   end
 
   def login
@@ -112,6 +112,7 @@ class ImportTiresFromEurotyre
           product.cost_price = row[7]
           product.price_in_offert = row[7] * 1.05
           product.show_in_offert = row[7].to_f > 0 ? true : false
+          product.supplier_id = 2
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)
@@ -122,7 +123,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(6) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            #puts "Creado articulo #{row[0]}"
+            puts "Creado articulo #{row[0]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
