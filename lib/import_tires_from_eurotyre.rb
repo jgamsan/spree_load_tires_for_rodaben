@@ -24,6 +24,7 @@ class ImportTiresFromEurotyre
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
     @taxons = Hash[*t]
+    @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
     I18n.locale = 'es'
   end
 
