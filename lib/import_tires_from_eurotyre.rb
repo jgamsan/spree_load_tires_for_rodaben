@@ -97,9 +97,9 @@ class ImportTiresFromEurotyre
           variante = Spree::Variant.find_by_product_id(articulo.id)
           variante.update_attributes(
               :count_on_hand => row[9],
-              :cost_price => row[7],
+              :cost_price => (row[7].nil? ? row[8] : row[7]) * 1.05,
               :price => row[8] * 1.05,
-              :price_in_offert => row[7] * 1.05 #falta de poner el precio de venta segun cliente
+              :price_in_offert => (row[7].nil? ? row[8] : row[7]) * 1.05 #falta de poner el precio de venta segun cliente
           )
           @updated += 1
           puts "Actualizado #{row[6]}"                            # actualizar los precios
@@ -164,6 +164,7 @@ class ImportTiresFromEurotyre
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
     ancho = row[0]
     ancho == nil ? ancho : @widths.index(ancho) + 1
+    raise "Ancho no incluido" if @widths.include? (ancho)
   end
 
   def set_serial(row)
