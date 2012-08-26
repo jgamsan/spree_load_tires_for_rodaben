@@ -28,13 +28,13 @@ class ImportTiresFromEurotyre
   end
 
   def run
-    #if login
-      #read_from_eurotyre
-      #export_to_csv
-      load_from_csv
-      delete_no_updated
-      send_mail
-    #end
+    if login
+      read_from_eurotyre
+      export_to_csv
+#      load_from_csv
+#      delete_no_updated
+#      send_mail
+    end
   end
 
   def login
@@ -64,7 +64,7 @@ class ImportTiresFromEurotyre
       for i in 0..(ruedas.count/10) - 1
         @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
                   ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8]]
+                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
         @readed += 1
       end
       ruedas.clear
@@ -125,7 +125,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(6) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            puts "Creado articulo #{row[0]}"
+            puts "Creado articulo #{row[6]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
