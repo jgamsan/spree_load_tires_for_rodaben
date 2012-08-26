@@ -166,7 +166,7 @@ class ImportTiresFromEurotyre
     if @widths.include? (ancho)
       @widths.index(ancho) + 1
     else
-      nueva = TireWidth.create(:name => ancho)
+      nueva = Spree::TireWidth.create(:name => ancho)
       return nueva.id
     end
   end
@@ -176,7 +176,7 @@ class ImportTiresFromEurotyre
     if @series.include? (serie)
       @series.index(serie) + 1
     else
-      nueva = TireSerial.create(:name => serie)
+      nueva = Spree::TireSerial.create(:name => serie)
       return nueva.id
     end
   end
@@ -186,7 +186,7 @@ class ImportTiresFromEurotyre
     if @llantas.include? (llanta)
       @llantas.index(llanta) + 1
     else
-      nueva = TireInnertube.create(:name => llanta)
+      nueva = Spree::TireInnertube.create(:name => llanta)
       return nueva.id
     end
   end
@@ -196,7 +196,7 @@ class ImportTiresFromEurotyre
     if @vel.include? (vel)
       @vel.index(vel) + 1
     else
-      nueva = TireSpeedCode.create(:name => vel)
+      nueva = Spree::TireSpeedCode.create(:name => vel)
       return nueva.id
     end
   end
