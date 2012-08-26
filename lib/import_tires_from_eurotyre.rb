@@ -34,7 +34,7 @@ class ImportTiresFromEurotyre
 #      export_to_csv
       load_from_csv
       delete_no_updated
-      send_mail
+#      send_mail
 #    end
   end
 
@@ -163,23 +163,42 @@ class ImportTiresFromEurotyre
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
     ancho = row[0]
-    ancho == nil ? ancho : @widths.index(ancho) + 1
-    raise "Ancho no incluido" if !@widths.include? (ancho)
+    if @widths.include? (ancho)
+      @widths.index(ancho) + 1
+    else
+      nueva = TireWidth.create(:name => ancho)
+      return nueva.id
+    end
   end
 
   def set_serial(row)
     serie = row[1]
-    serie == nil ? serie : @series.index(serie) + 1
+    if @series.include? (serie)
+      @series.index(serie) + 1
+    else
+      nueva = TireSerial.create(:name => serie)
+      return nueva.id
+    end
   end
 
   def set_innertube(row)
     llanta = row[2]
-    llanta == nil ? llanta : @llantas.index(llanta) + 1
+    if @llantas.include? (llanta)
+      @llantas.index(llanta) + 1
+    else
+      nueva = TireInnertube.create(:name => llanta)
+      return nueva.id
+    end
   end
 
   def set_speed_code(row)
     vel = row[4]
-    vel == nil ? vel : @vel.index(vel) + 1
+    if @vel.include? (vel)
+      @vel.index(vel) + 1
+    else
+      nueva = TireSpeedCode.create(:name => vel)
+      return nueva.id
+    end
   end
 
   def set_brand(row)
