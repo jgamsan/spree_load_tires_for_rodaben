@@ -96,13 +96,13 @@ class ImportTiresFromEurotyre
           articulo.update_column(:show_in_offert, row[7].to_f > 0 ? true : false)
           variante = Spree::Variant.find_by_product_id(articulo.id)
           variante.update_attributes(
-              :count_on_hand => set_stock(row[9]),
+              :count_on_hand => row[9],
               :cost_price => row[7],
               :price => row[8] * 1.05,
               :price_in_offert => row[7] * 1.05 #falta de poner el precio de venta segun cliente
           )
           @updated += 1
-                                      # actualizar los precios
+          puts "Actualizado #{row[6]}"                            # actualizar los precios
         else
           i += 1
           # crear uno nuevo
