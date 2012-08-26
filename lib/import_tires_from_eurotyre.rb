@@ -21,7 +21,9 @@ class ImportTiresFromEurotyre
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").flatten
+    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
+    @taxons = Hash[*t]
     I18n.locale = 'es'
   end
 
@@ -179,8 +181,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    marca = row[5].titleize
-    Spree::Taxon.find_by_name(:name => marca).id
+    @taxons.fetch(row[5])
   end
 
   def delete_no_updated
