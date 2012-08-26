@@ -164,7 +164,7 @@ class ImportTiresFromEurotyre
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
     ancho = row[0]
     ancho == nil ? ancho : @widths.index(ancho) + 1
-    raise "Ancho no incluido" if @widths.include? (ancho)
+    raise "Ancho no incluido" if !@widths.include? (ancho)
   end
 
   def set_serial(row)
