@@ -93,7 +93,7 @@ class ImportTiresFromEurotyre
       begin
         if productos.include?(row[6]) # producto existe
           articulo = Spree::Product.find_by_name(row[6])
-          articulo.update_column(:show_in_offert, row[7].empty ? false : true)
+          articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
           variante = Spree::Variant.find_by_product_id(articulo.id)
           variante.update_attributes(
               :count_on_hand => row[9],
@@ -114,7 +114,7 @@ class ImportTiresFromEurotyre
           product.price = row[8] * 1.05 #falta de poner el precio de venta segun cliente
           product.cost_price = (row[7].empty? ? row[8] : row[7]) * 1.05
           product.price_in_offert = (row[7].empty? ? row[8] : row[7]) * 1.05
-          product.show_in_offert = row[7].empty ? false : true
+          product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
