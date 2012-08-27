@@ -1,6 +1,5 @@
 # encoding: UTF-8
 require 'csv'
-require 'mechanize'
 
 class ImportTiresFromEurotyre
 
@@ -22,31 +21,34 @@ class ImportTiresFromEurotyre
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").flatten
+    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
+    @taxons = Hash[*t]
+    @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
     I18n.locale = 'es'
   end
 
   def run
-    if login
-      read_from_eurotyre(login)
-      export_to_csv
+#    if login
+#      read_from_eurotyre
+#      export_to_csv
       load_from_csv
       delete_no_updated
-      send_mail
-    end
+#      send_mail
+#    end
   end
 
   def login
     page = @agent.get('http://www.eurotyre.pt/shop/login')
-    etyre_form = page.form('loginform')
-    etyre_form.username = 'nrodaben@yahoo.es'
-    etyre_form.passwd = 'jose1222'
-    page = etyre_form.submit
+    eurotyre_form = page.form('loginform')
+    eurotyre_form.username = 'nrodaben@yahoo.es'
+    eurotyre_form.passwd = 'jose1222'
+    eurotyre_form.submit
   end
 
-  def read_from_eurotyre(page)
-    #str = "http://www.eurotyre.pt/shop/shop"
-    #page = @agent.get(str)
+  def read_from_eurotyre
+    str = "http://www.eurotyre.pt/shop/shop"
+    page = @agent.get(str)
     ruedas = []
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
@@ -63,7 +65,7 @@ class ImportTiresFromEurotyre
       for i in 0..(ruedas.count/10) - 1
         @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
                   ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8]]
+                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
         @readed += 1
       end
       ruedas.clear
@@ -91,16 +93,16 @@ class ImportTiresFromEurotyre
       begin
         if productos.include?(row[6]) # producto existe
           articulo = Spree::Product.find_by_name(row[6])
-          articulo.update_column(:show_in_offert, row[7].to_f > 0 ? true : false)
+          articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
           variante = Spree::Variant.find_by_product_id(articulo.id)
           variante.update_attributes(
-              :count_on_hand => set_stock(row[9]),
-              :cost_price => row[7],
+              :count_on_hand => row[9],
+              :cost_price => (row[7].empty? ? row[8] : row[7]) * 1.05,
               :price => row[8] * 1.05,
-              :price_in_offert => row[7] * 1.05 #falta de poner el precio de venta segun cliente
+              :price_in_offert => (row[7].empty? ? row[8] : row[7]) * 1.05 #falta de poner el precio de venta segun cliente
           )
           @updated += 1
-                                      # actualizar los precios
+          puts "Actualizado #{row[6]}"                            # actualizar los precios
         else
           i += 1
           # crear uno nuevo
@@ -110,9 +112,10 @@ class ImportTiresFromEurotyre
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
           product.price = row[8] * 1.05 #falta de poner el precio de venta segun cliente
-          product.cost_price = row[7]
-          product.price_in_offert = row[7] * 1.05
-          product.show_in_offert = row[7].to_f > 0 ? true : false
+          product.cost_price = (row[7].empty? ? row[8] : row[7]) * 1.05
+          product.price_in_offert = (row[7].empty? ? row[8] : row[7]) * 1.05
+          product.show_in_offert = row[7].empty? ? false : true
+          product.supplier_id = 2
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)
@@ -123,7 +126,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(6) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            #puts "Creado articulo #{row[0]}"
+            puts "Creado articulo #{row[6]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
@@ -135,7 +138,7 @@ class ImportTiresFromEurotyre
         end
       rescue Exception => e
         #puts e
-        fallos << [row[0], e]
+        fallos << [row[6], e]
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
         next
       end
@@ -160,27 +163,46 @@ class ImportTiresFromEurotyre
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
     ancho = row[0]
-    ancho == nil ? ancho : @widths.index(ancho) + 1
+    if @widths.include? (ancho)
+      @widths.index(ancho) + 1
+    else
+      nueva = Spree::TireWidth.create(:name => ancho)
+      return nueva.id
+    end
   end
 
   def set_serial(row)
     serie = row[1]
-    serie == nil ? serie : @series.index(serie) + 1
+    if @series.include? (serie)
+      @series.index(serie) + 1
+    else
+      nueva = Spree::TireSerial.create(:name => serie)
+      return nueva.id
+    end
   end
 
   def set_innertube(row)
     llanta = row[2]
-    llanta == nil ? llanta : @llantas.index(llanta) + 1
+    if @llantas.include? (llanta)
+      @llantas.index(llanta) + 1
+    else
+      nueva = Spree::TireInnertube.create(:name => llanta)
+      return nueva.id
+    end
   end
 
   def set_speed_code(row)
     vel = row[4]
-    vel == nil ? vel : @vel.index(vel) + 1
+    if @vel.include? (vel)
+      @vel.index(vel) + 1
+    else
+      nueva = Spree::TireSpeedCode.create(:name => vel)
+      return nueva.id
+    end
   end
 
   def set_brand(row)
-    marca = row[5].titleize
-    Spree::Taxon.find_by_name(:name => marca).id
+    @taxons.fetch(row[5])
   end
 
   def delete_no_updated
@@ -194,5 +216,12 @@ class ImportTiresFromEurotyre
       logger.error("#{e.class.name}: #{e.message}")
       logger.error(e.backtrace * "\n")
     end
+  end
+
+  def add_image(product, dir, file)
+    type = file.split(".").last
+    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
+    i.viewable = product.master
+    i.save
   end
 end
