@@ -60,7 +60,7 @@ class ImportTiresFromGane
             p = r[1].to_s.delete("€").strip.gsub(/,/, '.').to_f
             k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
-            img = read_image(l)
+            img = read_image(l) if Spree::Product.find_by_name(t).nil?
             #puts "Stock es #{p}. PVP final es #{pf}"
           end
           @total << [t, s, p, k, pf, img]
