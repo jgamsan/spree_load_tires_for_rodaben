@@ -73,7 +73,7 @@ class ImportTiresFromGane
       end
       links = links.uniq
       str = links[0].to_s
-      #puts str
+      puts str
     end
   end
 
@@ -134,7 +134,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              #puts "Creado articulo #{row[0]}"
+              puts "Creado articulo #{row[0]}"
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
