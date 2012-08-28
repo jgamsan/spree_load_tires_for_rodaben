@@ -123,6 +123,7 @@ class ImportTiresFromGane
             product.cost_price = row[4]
             product.price_in_offert = row[2] * 1.05
             product.show_in_offert = row[3].to_f > 0 ? true : false
+            product.supplier_id = 1
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
