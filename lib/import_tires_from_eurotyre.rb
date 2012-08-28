@@ -21,8 +21,8 @@ class ImportTiresFromEurotyre
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
-    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
+    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
     @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
     I18n.locale = 'es'
@@ -115,7 +115,7 @@ class ImportTiresFromEurotyre
           product.cost_price = (row[7].empty? ? row[8] : row[7]) * 1.05
           product.price_in_offert = (row[7].empty? ? row[8] : row[7]) * 1.05
           product.show_in_offert = row[7].empty? ? false : true
-          product.supplier_id = 2
+          product.supplier_id = 2027
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)

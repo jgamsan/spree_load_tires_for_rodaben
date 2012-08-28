@@ -22,8 +22,8 @@ class ImportTiresFromGane
     @series = Spree::TireSerial.all.map {|x| x.name}
     @llantas = Spree::TireInnertube.all.map {|x| x.name}
     @vel = Spree::TireSpeedCode.all.map {|x| x.name}
-    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name.upcase, x.id]}.flatten
-    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name.upcase}
+    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
+    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
     @error = ""
     @modificaciones = %w(GOODYEAR)
@@ -123,7 +123,7 @@ class ImportTiresFromGane
             product.cost_price = row[4]
             product.price_in_offert = row[2] * 1.05
             product.show_in_offert = row[3].to_f > 0 ? true : false
-            product.supplier_id = 1
+            product.supplier_id = 1045
             product.tire_width_id = set_width(result)
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
