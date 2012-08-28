@@ -36,7 +36,7 @@ class ImportTiresFromGane
       read_from_gane
       export_to_csv
       load_from_csv
-      delete_no_updated
+      #delete_no_updated
       send_mail
     end
   end
@@ -175,7 +175,7 @@ class ImportTiresFromGane
 
   def delete_no_updated
     nuevos = []
-    total = Spree::Product.all
+    total = Spree::Product.where(:support_id => 1045)
     almacenados = total.map {|x| x.name}
     CSV.foreach(@final) do |row|
       nuevos << row[0]

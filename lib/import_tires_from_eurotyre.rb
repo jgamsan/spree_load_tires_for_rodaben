@@ -206,7 +206,20 @@ class ImportTiresFromEurotyre
   end
 
   def delete_no_updated
-
+    nuevos = []
+    total = Spree::Product.where(:support_id => 2027)
+    almacenados = total.map {|x| x.name}
+    CSV.foreach(@final) do |row|
+      nuevos << row[0]
+    end
+    eliminar = almacenados - nuevos
+    eliminar.each do |element|
+      t = Spree::Product.find_by_name(element)
+      unless t.nil?
+        t.destroy
+        @deleted += 1
+      end
+    end
   end
 
   def send_mail
