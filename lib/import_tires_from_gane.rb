@@ -18,10 +18,6 @@ class ImportTiresFromGane
     @deleted = 0
     @readed = 0
     @tubes = %w(TL TT RU)
-    @widths = Spree::TireWidth.all.map {|x| x.name}
-    @series = Spree::TireSerial.all.map {|x| x.name}
-    @llantas = Spree::TireInnertube.all.map {|x| x.name}
-    @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
@@ -336,24 +332,49 @@ class ImportTiresFromGane
   end
 
   def set_width(row)
-    ancho = row[0]
-    ancho == nil ? ancho : @widths.index(ancho) + 1
+    if row[0].nil?
+      return nil
+    else
+      ancho = Spree::TireWidth.find_by_name(row[0])
+      if ancho.nil?
+        raise "Este ancho no existe #{row[0]}"
+      else
+        return ancho.id
+      end
+    end
   end
 
   def set_serial(row)
-    serie = row[1]
-    serie == nil ? serie : @series.index(serie) + 1
+    if row[1].nil?
+      return nil
+    else
+      serie = Spree::TireSerial.find_by_name(row[1])
+      if serie.nil?
+        raise "Este perfil no existe #{row[1]}"
+      else
+        return serie.id
+      end
+    end
+
   end
 
   def set_innertube(row)
-    llanta = row[2]
-    llanta == nil ? llanta : @llantas.index(llanta) + 1
+    if row[2].nil?
+      row[2]
+    else
+      llanta = Spree::TireInnertube.find_by_name(row[2])
+      if llanta.nil?
+        raise "Esta llanta no existe #{row[2]}"
+      else
+        return llanta.id
+      end
+    end
   end
 
   def set_speed_code(row)
     str = row[3]
     if str.nil?
-      vel = nil
+      nil
     else
       if str =~ %r{(\S+)(?:/|:)(\S+)}
         vel_nueva = [$1,$2]
@@ -363,8 +384,13 @@ class ImportTiresFromGane
       else
         vel = get_vel_code(str)
       end
+      vel_final = Spree::TireSpeedCode.find_by_name(vel)
+      if vel_final.nil?
+        raise "Este IV no existe #{vel_final}"
+      else
+        return vel_final.id
+      end
     end
-    vel == nil ? vel : @vel.index(vel) + 1
   end
 
   def set_season(name)
