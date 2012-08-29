@@ -17,10 +17,6 @@ class ImportTiresFromEurotyre
     @updated = 0
     @deleted = 0
     @readed = 0
-    @widths = Spree::TireWidth.all.map {|x| x.name}
-    @series = Spree::TireSerial.all.map {|x| x.name}
-    @llantas = Spree::TireInnertube.all.map {|x| x.name}
-    @vel = Spree::TireSpeedCode.all.map {|x| x.name}
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
@@ -162,42 +158,38 @@ class ImportTiresFromEurotyre
 
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
-    ancho = row[0]
-    if @widths.include? (ancho)
-      @widths.index(ancho) + 1
+    ancho = Spree::TireWidth.find_by_name(row[0])
+    if ancho.nil?
+      raise "Este ancho no existe #{row[0]}"
     else
-      nueva = Spree::TireWidth.create(:name => ancho)
-      return nueva.id
+      return ancho.id
     end
   end
 
   def set_serial(row)
-    serie = row[1]
-    if @series.include? (serie)
-      @series.index(serie) + 1
+    serie = Spree::TireSerial.find_by_name(row[1])
+    if serie.nil?
+      raise "Este perfil no existe #{row[1]}"
     else
-      nueva = Spree::TireSerial.create(:name => serie)
-      return nueva.id
+      return serie.id
     end
   end
 
   def set_innertube(row)
-    llanta = row[2]
-    if @llantas.include? (llanta)
-      @llantas.index(llanta) + 1
+    llanta = Spree::TireInnertube.find_by_name(row[2])
+    if llanta.nil?
+      raise "Esta llanta no existe #{row[2]}"
     else
-      nueva = Spree::TireInnertube.create(:name => llanta)
-      return nueva.id
+      return llanta.id
     end
   end
 
   def set_speed_code(row)
-    vel = row[4]
-    if @vel.include? (vel)
-      @vel.index(vel) + 1
+    vel = Spree::TireSpeedCode.find_by_name(row[4])]
+    if vel.nil?
+      raise "Este IV no existe #{row[4]}"
     else
-      nueva = Spree::TireSpeedCode.create(:name => vel)
-      return nueva.id
+      return vel.id
     end
   end
 
