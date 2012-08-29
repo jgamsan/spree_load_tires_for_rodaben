@@ -185,7 +185,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_speed_code(row)
-    vel = Spree::TireSpeedCode.find_by_name(row[4])]
+    vel = Spree::TireSpeedCode.find_by_name(row[4])
     if vel.nil?
       raise "Este IV no existe #{row[4]}"
     else
