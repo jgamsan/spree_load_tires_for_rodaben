@@ -186,7 +186,12 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    @taxons.fetch(row[5])
+    brand = @taxons.fetch(row[5])
+    if brand.nil?
+      raise "Marca #{row[5]} no esta registrada"
+    else
+
+    end
   end
 
   def delete_no_updated
