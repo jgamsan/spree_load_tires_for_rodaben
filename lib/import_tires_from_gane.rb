@@ -8,6 +8,7 @@ class ImportTiresFromGane
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-gane.csv"
     @send_file = "listado-neumaticos-no-incorporados-gane.csv"
+    @file_old = "listado-gane-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -162,20 +163,27 @@ class ImportTiresFromGane
   end
 
   def delete_no_updated
-    nuevos = []
-    total = Spree::Product.where(:support_id => 1045)
-    almacenados = total.map {|x| x.name}
-    CSV.foreach(@final) do |row|
-      nuevos << row[0]
-    end
-    eliminar = almacenados - nuevos
-    eliminar.each do |element|
-      t = Spree::Product.find_by_name(element)
-      unless t.nil?
-        t.destroy
-        @deleted += 1
+    if File.exist?(File.join(@directory, @file_old))
+      antiguo = read_file(File.join(@directory, @file_old))
+      nuevo = read_file(File.join(@directory, @final))
+      eliminar = antiguo - nuevo
+      eliminar.each do |element|
+        t = Spree::Product.find_by_name(element)
+        unless t.nil?
+          t.destroy
+          @deleted += 1
+        end
       end
+      File.delete(File.join(@directory, @file_old))
     end
+    File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
+  end
+
+  def read_file(file)
+    CSV.foreach(file) do |row|
+      nuevos << row[6]
+    end
+    return nuevos
   end
 
   def send_mail
