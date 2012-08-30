@@ -120,7 +120,7 @@ class ImportTiresFromEurotyre
           product.tire_rf = false
           product.tire_gr = false
           product.tire_season = 2
-          product.taxons << Spree::Taxon.find(6) #cargar categoria
+          product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
             puts "Creado articulo #{row[6]}"
