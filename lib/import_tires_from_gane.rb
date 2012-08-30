@@ -5,8 +5,9 @@ class ImportTiresFromGane
 
   def initialize()
     @agent = Mechanize.new
-    @final = "#{Rails.root}/vendor/products/listado-neumaticos.csv"
-    @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados.csv"
+    @directory = "#{Rails.root}/vendor/products"
+    @final = "listado-neumaticos-gane.csv"
+    @send_file = "listado-neumaticos-no-incorporados-gane.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -74,7 +75,7 @@ class ImportTiresFromGane
   end
 
   def export_to_csv
-    CSV.open(@final, "wb") do |row|
+    CSV.open(File.join(@directory, @final), "wb") do |row|
       @total.each do |element|
         #[nombre, stock, precio, descuento, precio final]
         row << element
@@ -90,7 +91,7 @@ class ImportTiresFromGane
     i = j = 0
     hoy = Date.today
     productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
-    CSV.foreach(@final) do |row|
+    CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
@@ -146,22 +147,13 @@ class ImportTiresFromGane
           end
         end
       rescue Exception => e
-        #puts e
-        fallos << [row[0], e]
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], e]
         next
       end
     end
-    unless fallos.empty?
-      CSV.open("#{Rails.root}/vendor/products/listado-fallos.csv", "wb") do |row|
-        fallos.each do |element|
-          row << element
-        end
-      end
-    end
     unless no_leidos.empty?
-      headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen"]
-      CSV.open(@send_file, "wb", {headers: headers_row, write_headers: true}) do |row|
+      headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen", "Motivo"]
+      CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
@@ -188,7 +180,7 @@ class ImportTiresFromGane
 
   def send_mail
     begin
-      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created).deliver
+      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @directory, @send_file, "GANE").deliver
     rescue Exception => e
       logger.error("#{e.class.name}: #{e.message}")
       logger.error(e.backtrace * "\n")

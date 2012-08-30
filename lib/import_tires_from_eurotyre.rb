@@ -5,8 +5,9 @@ class ImportTiresFromEurotyre
 
   def initialize()
     @agent = Mechanize.new
-    @final = "#{Rails.root}/vendor/products/listado-neumaticos-eurotyre.csv"
-    @send_file = "#{Rails.root}/vendor/products/listado-neumaticos-no-incorporados-eurotyre.csv"
+    @directory = "#{Rails.root}/vendor/products"
+    @final = "listado-neumaticos-eurotyre.csv"
+    @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -69,7 +70,7 @@ class ImportTiresFromEurotyre
   end
 
   def export_to_csv
-    CSV.open(@final, "wb") do |row|
+    CSV.open(File.join(@directory, @final), "wb") do |row|
       @total.each do |element|
         #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
         row << element
@@ -85,7 +86,7 @@ class ImportTiresFromEurotyre
     i = j = 0
     hoy = Date.today
     productos = Spree::Product.where(:supplier_id => 2).map {|x| x.name}.flatten
-    CSV.foreach(@final) do |row|
+    CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         if productos.include?(row[6]) # producto existe
           articulo = Spree::Product.find_by_name(row[6])
@@ -133,22 +134,13 @@ class ImportTiresFromEurotyre
           @created += 1
         end
       rescue Exception => e
-        #puts e
-        fallos << [row[6], e]
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5]]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], e]
         next
-      end
-    end
-    unless fallos.empty?
-      CSV.open("#{Rails.root}/vendor/products/listado-fallos-eurotyre.csv", "wb") do |row|
-        fallos.each do |element|
-          row << element
-        end
       end
     end
     unless no_leidos.empty?
       headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
-      CSV.open(@send_file, "wb", {headers: headers_row, write_headers: true}) do |row|
+      CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
@@ -216,7 +208,7 @@ class ImportTiresFromEurotyre
 
   def send_mail
     begin
-      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created).deliver
+      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @directory, @send_file, "EUROTYRE").deliver
     rescue Exception => e
       logger.error("#{e.class.name}: #{e.message}")
       logger.error(e.backtrace * "\n")
