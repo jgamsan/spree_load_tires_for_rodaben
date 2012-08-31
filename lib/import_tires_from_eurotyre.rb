@@ -19,9 +19,9 @@ class ImportTiresFromEurotyre
     @updated = 0
     @deleted = 0
     @readed = 0
-    t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
+    #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
-    @taxons = Hash[*t]
+    #@taxons = Hash[*t]
     @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
     I18n.locale = 'es'
   end
@@ -187,11 +187,11 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    brand = @taxons.fetch(row[5])
+    brand = Spree::Taxon.where(:parent_id => 2, :name => row[5]).first #@taxons.fetch(row[5])
     if brand.nil?
       raise "Marca #{row[5]} no esta registrada"
     else
-
+      return brand.id
     end
   end
 
