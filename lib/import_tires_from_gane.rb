@@ -34,7 +34,7 @@ class ImportTiresFromGane
       read_from_gane
       export_to_csv
       load_from_csv
-      #delete_no_updated
+      delete_no_updated
       send_mail
     end
   end
@@ -71,7 +71,7 @@ class ImportTiresFromGane
       end
       links = links.uniq
       str = links[0].to_s
-      puts str
+      #puts str
     end
   end
 
@@ -91,7 +91,7 @@ class ImportTiresFromGane
     no_leidos = []
     i = j = 0
     hoy = Date.today
-    productos = Spree::Product.find_by_sql("Select name from spree_products;").map {|x| x.name}.flatten
+    productos = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         unless row[0].blank?
@@ -132,7 +132,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              puts "Creado articulo #{row[0]}"
+              #puts "Creado articulo #{row[0]}"
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
@@ -386,7 +386,7 @@ class ImportTiresFromGane
       end
       vel_final = Spree::TireSpeedCode.find_by_name(vel)
       if vel_final.nil?
-        raise "Este IV no existe #{vel_final}"
+        raise "Este Indice Velocidad no existe #{vel}"
       else
         return vel_final.id
       end

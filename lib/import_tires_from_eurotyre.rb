@@ -31,7 +31,7 @@ class ImportTiresFromEurotyre
       read_from_eurotyre
       export_to_csv
       load_from_csv
-#      delete_no_updated
+      delete_no_updated
       send_mail
     end
   end
@@ -51,7 +51,7 @@ class ImportTiresFromEurotyre
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
     @marcas_eurotyre.each do |marca|
-      puts "descargando #{marca}"
+      #puts "descargando #{marca}"
       select_list.value = [marca]
       page2 = form.submit
       #puts marca
@@ -86,7 +86,7 @@ class ImportTiresFromEurotyre
     no_leidos = []
     i = j = 0
     hoy = Date.today
-    productos = Spree::Product.where(:supplier_id => 2).map {|x| x.name}.flatten
+    productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         if productos.include?(row[6]) # producto existe
@@ -100,7 +100,7 @@ class ImportTiresFromEurotyre
               :price_in_offert => row[8] * 1.05 #falta de poner el precio de venta segun cliente
           )
           @updated += 1
-          puts "Actualizado #{row[6]}"                            # actualizar los precios
+          #puts "Actualizado #{row[6]}"                            # actualizar los precios
         else
           i += 1
           # crear uno nuevo
@@ -124,7 +124,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            puts "Creado articulo #{row[6]}"
+            #puts "Creado articulo #{row[6]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
@@ -178,11 +178,15 @@ class ImportTiresFromEurotyre
   end
 
   def set_speed_code(row)
-    vel = Spree::TireSpeedCode.find_by_name(row[4])
-    if vel.nil?
-      raise "Este IV no existe #{row[4]}"
+    if row[4].nil?
+      nil
     else
-      return vel.id
+      vel = Spree::TireSpeedCode.find_by_name(row[4])
+      if vel.nil?
+        raise "Este Indice Velocidad no existe #{row[4]}"
+      else
+        return vel.id
+      end
     end
   end
 
