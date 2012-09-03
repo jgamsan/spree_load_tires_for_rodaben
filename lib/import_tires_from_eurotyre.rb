@@ -19,6 +19,7 @@ class ImportTiresFromEurotyre
     @updated = 0
     @deleted = 0
     @readed = 0
+    @inc_precio = 7.95
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -96,8 +97,8 @@ class ImportTiresFromEurotyre
           variante.update_attributes(
               :count_on_hand => row[9],
               :cost_price => row[7].empty? ? row[8] : row[7],
-              :price => (row[7].empty? ? row[8] : row[7]) * 1.05,
-              :price_in_offert => row[8] * 1.05 #falta de poner el precio de venta segun cliente
+              :price => (row[7].empty? ? row[8] : row[7]) + @inc_precio,
+              :price_in_offert => row[8] + @inc_precio
           )
           @updated += 1
           #puts "Actualizado #{row[6]}"                            # actualizar los precios
@@ -109,9 +110,9 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
-          product.price = (row[7].empty? ? row[8] : row[7]) * 1.05 #falta de poner el precio de venta segun cliente
+          product.price = (row[7].empty? ? row[8] : row[7]) + @inc_precio #falta de poner el precio de venta segun cliente
           product.cost_price = row[7].empty? ? row[8] : row[7]
-          product.price_in_offert = row[8] * 1.05
+          product.price_in_offert = row[8] + @inc_precio
           product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)

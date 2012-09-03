@@ -19,6 +19,7 @@ class ImportTiresFromGane
     @updated = 0
     @deleted = 0
     @readed = 0
+    @inc_precio = 7.95
     @tubes = %w(TL TT RU)
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
@@ -102,8 +103,8 @@ class ImportTiresFromGane
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
               :cost_price => row[4],
-              :price => row[4] * 1.05,
-              :price_in_offert => row[2] * 1.05 #falta de poner el precio de venta segun cliente
+              :price => row[4] + @inc_precio,
+              :price_in_offert => row[2] + @inc_precio
             )
             @updated += 1
             # actualizar los precios
@@ -117,9 +118,9 @@ class ImportTiresFromGane
             product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
             product.available_on = hoy - 1.day
             #product.count_on_hand = set_stock(row[1])
-            product.price = row[4] * 1.05 #falta de poner el precio de venta segun cliente
+            product.price = row[4] + @inc_precio #falta de poner el precio de venta segun cliente
             product.cost_price = row[4]
-            product.price_in_offert = row[2] * 1.05
+            product.price_in_offert = row[2] + @inc_precio
             product.show_in_offert = row[3].to_f > 0 ? true : false
             product.supplier_id = 1045
             product.tire_width_id = set_width(result)
