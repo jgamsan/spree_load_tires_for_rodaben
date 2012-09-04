@@ -52,7 +52,7 @@ class ImportTiresFromEurotyre
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
     @marcas_eurotyre.each do |marca|
-      puts "descargando #{marca}"
+      #puts "descargando #{marca}"
       select_list.value = [marca]
       page2 = form.submit
       #puts marca
@@ -125,7 +125,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            puts "Creado articulo #{row[6]}"
+            #puts "Creado articulo #{row[6]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
