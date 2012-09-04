@@ -181,6 +181,7 @@ class ImportTiresFromGane
   end
 
   def read_file(file)
+    nuevos = []
     CSV.foreach(file) do |row|
       nuevos << row[6]
     end
