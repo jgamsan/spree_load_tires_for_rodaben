@@ -8,7 +8,7 @@ class ImportTiresFromEurotyre
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-eurotyre.csv"
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
-    @file_old = "listado-eurotyre-antiguo.csv"
+    #@file_old = "listado-eurotyre-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -21,9 +21,9 @@ class ImportTiresFromEurotyre
     @readed = 0
     @inc_precio = 7.95
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
-    @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
+    #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
-    @marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
+    #@marcas_eurotyre = CSV.read("#{Rails.root}/vendor/products/listado-marcas-eurotyre.csv").map {|x| x[0]}
     I18n.locale = 'es'
   end
 
@@ -31,9 +31,9 @@ class ImportTiresFromEurotyre
     if login
       read_from_eurotyre
       export_to_csv
-#      load_from_csv
-#      delete_no_updated
-#      send_mail
+      load_from_csv
+      delete_no_updated
+      send_mail
     end
   end
 
@@ -53,24 +53,21 @@ class ImportTiresFromEurotyre
     select_list = form.field_with(:name => "u_marca")
     list = form.field_with(:name => "u_marca").options
     list.each do |marca|
-      unless marca.blank?
-        select_list.value = [marca]
-        puts "Leyendo #{marca}"
-        page2 = form.submit
-        #puts marca
-        page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-          for i in 0..9
-            ruedas << d.search(".//td")[i].text
-          end
+      select_list.value = [marca]
+      #puts "Leyendo #{marca}"
+      page2 = form.submit
+      page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
+        for i in 0..9
+          ruedas << d.search(".//td")[i].text
         end
-        for i in 0..(ruedas.count/10) - 1
-          @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
-                    ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                    ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
-          @readed += 1
-        end
-        ruedas.clear
       end
+      for i in 0..(ruedas.count/10) - 1
+        @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
+                  ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
+                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
+        @readed += 1
+      end
+      ruedas.clear
     end
   end
 
@@ -205,7 +202,8 @@ class ImportTiresFromEurotyre
 
   def delete_no_updated
     if File.exist?(File.join(@directory, @file_old))
-      antiguo = read_file(File.join(@directory, @file_old))
+      #antiguo = read_file(File.join(@directory, @file_old))
+      antiguo = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
       nuevo = read_file(File.join(@directory, @final))
       eliminar = antiguo - nuevo
       eliminar.each do |element|
@@ -215,9 +213,9 @@ class ImportTiresFromEurotyre
           @deleted += 1
         end
       end
-      File.delete(File.join(@directory, @file_old))
+      #File.delete(File.join(@directory, @file_old))
     end
-    File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
+    #File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
   end
 
   def read_file(file)

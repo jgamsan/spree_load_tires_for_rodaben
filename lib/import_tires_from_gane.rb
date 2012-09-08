@@ -8,7 +8,7 @@ class ImportTiresFromGane
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-gane.csv"
     @send_file = "listado-neumaticos-no-incorporados-gane.csv"
-    @file_old = "listado-gane-antiguo.csv"
+    #@file_old = "listado-gane-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -165,7 +165,8 @@ class ImportTiresFromGane
 
   def delete_no_updated
     if File.exist?(File.join(@directory, @file_old))
-      antiguo = read_file(File.join(@directory, @file_old))
+      #antiguo = read_file(File.join(@directory, @file_old))
+      antiguo = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
       nuevo = read_file(File.join(@directory, @final))
       eliminar = antiguo - nuevo
       eliminar.each do |element|
@@ -175,9 +176,9 @@ class ImportTiresFromGane
           @deleted += 1
         end
       end
-      File.delete(File.join(@directory, @file_old))
+      #File.delete(File.join(@directory, @file_old))
     end
-    File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
+    #File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
   end
 
   def read_file(file)
