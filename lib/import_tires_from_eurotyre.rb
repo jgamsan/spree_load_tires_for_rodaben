@@ -50,8 +50,9 @@ class ImportTiresFromEurotyre
     page = @agent.get(str)
     ruedas = []
     form = page.form('search')
-    select_list = form.field_with(:name => "u_marca").options
-    select_list.each do |marca|
+    select_list = form.field_with(:name => "u_marca")
+    list = form.field_with(:name => "u_marca").options
+    list.each do |marca|
       unless marca.blank?
         select_list.value = [marca]
         puts "Leyendo #{marca}"
