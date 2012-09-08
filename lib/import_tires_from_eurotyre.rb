@@ -31,10 +31,10 @@ class ImportTiresFromEurotyre
     if login
       read_from_eurotyre
       export_to_csv
-      load_from_csv
-      delete_no_updated
-      send_mail
-    end
+#      load_from_csv
+#      delete_no_updated
+#      send_mail
+#    end
   end
 
   def login
@@ -50,24 +50,26 @@ class ImportTiresFromEurotyre
     page = @agent.get(str)
     ruedas = []
     form = page.form('search')
-    select_list = form.field_with(:name => "u_marca")
-    @marcas_eurotyre.each do |marca|
-#      puts "descargando #{marca}"
-      select_list.value = [marca]
-      page2 = form.submit
-      #puts marca
-      page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-        for i in 0..9
-          ruedas << d.search(".//td")[i].text
+    select_list = form.field_with(:name => "u_marca").options
+    select_list.each do |marca|
+      unless marca.blank?
+        select_list.value = [marca]
+        puts "Leyendo #{marca}"
+        page2 = form.submit
+        #puts marca
+        page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
+          for i in 0..9
+            ruedas << d.search(".//td")[i].text
+          end
         end
+        for i in 0..(ruedas.count/10) - 1
+          @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
+                    ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
+                    ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
+          @readed += 1
+        end
+        ruedas.clear
       end
-      for i in 0..(ruedas.count/10) - 1
-        @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
-                  ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
-        @readed += 1
-      end
-      ruedas.clear
     end
   end
 
