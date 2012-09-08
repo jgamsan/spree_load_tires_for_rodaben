@@ -107,7 +107,7 @@ class ImportTiresFromGane
               :price_in_offert => (row[2].to_f + @inc_precio).round(2)
             )
             @updated += 1
-            # actualizar los precios
+            puts "Actualizado #{row[0]}" unless Rails.end.production?
           else
             result = read_format(row[0])
             i += 1
@@ -133,7 +133,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              #puts "Creado articulo #{row[0]}"
+              puts "Creado articulo #{row[0]}" unless Rails.end.production?
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
@@ -164,21 +164,16 @@ class ImportTiresFromGane
   end
 
   def delete_no_updated
-    if File.exist?(File.join(@directory, @file_old))
-      #antiguo = read_file(File.join(@directory, @file_old))
-      antiguo = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
-      nuevo = read_file(File.join(@directory, @final))
-      eliminar = antiguo - nuevo
-      eliminar.each do |element|
-        t = Spree::Product.find_by_name(element)
-        unless t.nil?
-          t.destroy
-          @deleted += 1
-        end
+    antiguo = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
+    nuevo = read_file(File.join(@directory, @final))
+    eliminar = antiguo - nuevo
+    eliminar.each do |element|
+      t = Spree::Product.find_by_name(element)
+      unless t.nil?
+        t.destroy
+        @deleted += 1
       end
-      #File.delete(File.join(@directory, @file_old))
     end
-    #File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
   end
 
   def read_file(file)

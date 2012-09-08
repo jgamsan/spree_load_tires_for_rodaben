@@ -54,7 +54,7 @@ class ImportTiresFromEurotyre
     list = form.field_with(:name => "u_marca").options
     list.each do |marca|
       select_list.value = [marca]
-      #puts "Leyendo #{marca}"
+      puts "Leyendo #{marca}" unless Rails.end.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
         for i in 0..9
@@ -101,7 +101,7 @@ class ImportTiresFromEurotyre
               :price_in_offert => (row[8].to_f + @inc_precio).round(2)
           )
           @updated += 1
-          puts "Actualizado #{row[6]}"                            # actualizar los precios
+          puts "Actualizado #{row[6]}" unless Rails.end.production?
         else
           i += 1
           # crear uno nuevo
@@ -125,7 +125,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-            puts "Creado articulo #{row[6]}"
+            puts "Creado articulo #{row[6]}" unless Rails.end.production?
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
@@ -201,21 +201,16 @@ class ImportTiresFromEurotyre
   end
 
   def delete_no_updated
-    if File.exist?(File.join(@directory, @file_old))
-      #antiguo = read_file(File.join(@directory, @file_old))
-      antiguo = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
-      nuevo = read_file(File.join(@directory, @final))
-      eliminar = antiguo - nuevo
-      eliminar.each do |element|
-        t = Spree::Product.find_by_name(element)
-        unless t.nil?
-          t.destroy
-          @deleted += 1
-        end
+    antiguo = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
+    nuevo = read_file(File.join(@directory, @final))
+    eliminar = antiguo - nuevo
+    eliminar.each do |element|
+      t = Spree::Product.find_by_name(element)
+      unless t.nil?
+        t.destroy
+        @deleted += 1
       end
-      #File.delete(File.join(@directory, @file_old))
     end
-    #File.rename(File.join(@directory, @final),File.join(@directory, @file_old))
   end
 
   def read_file(file)
