@@ -101,7 +101,7 @@ class ImportTiresFromEurotyre
               :price_in_offert => (row[8].to_f + @inc_precio).round(2)
           )
           @updated += 1
-#          puts "Actualizado #{row[6]}"                            # actualizar los precios
+          puts "Actualizado #{row[6]}"                            # actualizar los precios
         else
           i += 1
           # crear uno nuevo
@@ -125,7 +125,7 @@ class ImportTiresFromEurotyre
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
-#            puts "Creado articulo #{row[6]}"
+            puts "Creado articulo #{row[6]}"
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
