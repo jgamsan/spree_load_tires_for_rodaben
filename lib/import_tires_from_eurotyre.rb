@@ -97,8 +97,8 @@ class ImportTiresFromEurotyre
           variante.update_attributes(
               :count_on_hand => row[9],
               :cost_price => row[7].empty? ? row[8].to_f : row[7].to_f,
-              :price => ((row[7].empty? ? row[8].to_f : row[7].to_f) + @inc_precio).round(2),
-              :price_in_offert => (row[8].to_f + @inc_precio).round(2)
+              :price => (row[7].empty? ? row[8].to_f : row[7].to_f),
+              :price_in_offert => row[8].to_f
           )
           @updated += 1
           puts "Actualizado #{row[6]}" unless Rails.env.production?
@@ -110,9 +110,9 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
-          product.price = ((row[7].empty? ? row[8].to_f : row[7].to_f) + @inc_precio).round(2)
+          product.price = row[7].empty? ? row[8].to_f : row[7].to_f
           product.cost_price = row[7].empty? ? row[8].to_f : row[7].to_f
-          product.price_in_offert = (row[8].to_f + @inc_precio).round(2)
+          product.price_in_offert = row[8].to_f
           product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)
