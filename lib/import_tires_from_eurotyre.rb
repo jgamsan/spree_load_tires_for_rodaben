@@ -34,7 +34,7 @@ class ImportTiresFromEurotyre
 #      load_from_csv
 #      delete_no_updated
 #      send_mail
-#    end
+    end
   end
 
   def login
