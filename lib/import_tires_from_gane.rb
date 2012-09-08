@@ -107,7 +107,7 @@ class ImportTiresFromGane
               :price_in_offert => (row[2].to_f + @inc_precio).round(2)
             )
             @updated += 1
-            puts "Actualizado #{row[0]}" unless Rails.end.production?
+            puts "Actualizado #{row[0]}" unless Rails.env.production?
           else
             result = read_format(row[0])
             i += 1
@@ -133,7 +133,7 @@ class ImportTiresFromGane
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
-              puts "Creado articulo #{row[0]}" unless Rails.end.production?
+              puts "Creado articulo #{row[0]}" unless Rails.env.production?
               j += 1
             end
             v = Spree::Variant.find_by_product_id(product.id)
