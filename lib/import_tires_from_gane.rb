@@ -102,7 +102,7 @@ class ImportTiresFromGane
             variante = Spree::Variant.find_by_product_id(articulo.id)
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
-              :cost_price => row[4].to_f,
+              :cost_price => row[2].to_f,
               :price => (row[4].to_f + @inc_precio).round(2),
               :price_in_offert => (row[2].to_f + @inc_precio).round(2)
             )
@@ -179,7 +179,7 @@ class ImportTiresFromGane
   def read_file(file)
     nuevos = []
     CSV.foreach(file) do |row|
-      nuevos << row[6]
+      nuevos << row[0]
     end
     return nuevos
   end
