@@ -101,7 +101,6 @@ class ImportTiresFromEurotyre
             cost_price = row[7].to_f
             price = (row[7].to_f + @inc_precio).round(2)
           end
-          puts "Precio de costo es #{cost_price}" unless Rails.env.production?
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
