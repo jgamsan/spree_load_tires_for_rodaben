@@ -100,8 +100,10 @@ class ImportTiresFromGane
             articulo = Spree::Product.find_by_name(row[0])
             articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
-            variante.update_column(:cost_price, row[2].to_f)
-            variante.update_column(:price, (row[4].to_f + @inc_precio).round(2))
+            cost_price = row[2].to_f
+            price = (row[4].to_f + @inc_precio).round(2)
+            variante.update_column(:cost_price, cost_price)
+            variante.update_column(:price, price)
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
               :price_in_offert => (row[2].to_f + @inc_precio).round(2)
