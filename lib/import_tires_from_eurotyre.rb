@@ -94,10 +94,15 @@ class ImportTiresFromEurotyre
           articulo = Spree::Product.find_by_name(row[6])
           articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
           variante = Spree::Variant.find_by_product_id(articulo.id)
+          if row[7].empty?
+            cost_price = price = row[8].to_f
+          else
+            cost_price = price = row[7].to_f
+          end
           variante.update_attributes(
               :count_on_hand => row[9],
-              :cost_price => row[7].empty? ? row[8].to_f : row[7].to_f,
-              :price => (row[7].empty? ? row[8].to_f : row[7].to_f),
+              :cost_price => cost_price,
+              :price => price,
               :price_in_offert => row[8].to_f
           )
           @updated += 1
