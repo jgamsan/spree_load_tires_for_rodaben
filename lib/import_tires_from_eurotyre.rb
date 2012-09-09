@@ -99,6 +99,7 @@ class ImportTiresFromEurotyre
           else
             cost_price = price = row[7].to_f
           end
+          puts "Precio de costo es #{cost_price}" unless Rails.env.production?
           variante.update_attributes(
               :count_on_hand => row[9],
               :cost_price => cost_price,
