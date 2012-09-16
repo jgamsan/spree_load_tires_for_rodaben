@@ -19,7 +19,7 @@ class ImportTiresFromEurotyre
     @updated = 0
     @deleted = 0
     @readed = 0
-    @inc_precio = 7.95
+    @inc_precio = 9.95
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
