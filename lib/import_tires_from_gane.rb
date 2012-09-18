@@ -100,13 +100,13 @@ class ImportTiresFromGane
             articulo = Spree::Product.find_by_name(row[0])
             articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
-            cost_price = row[2].to_f
-            price = (row[4].to_f + @inc_precio).round(2)
+            cost_price = row[2].to_f * 1.21
+            price = (row[4].to_f * 1.21 + @inc_precio).round(2)
             variante.update_column(:cost_price, cost_price)
             variante.update_column(:price, price)
             variante.update_attributes(
               :count_on_hand => set_stock(row[1]),
-              :price_in_offert => (row[2].to_f + @inc_precio).round(2)
+              :price_in_offert => (row[2].to_f * 1.21 + @inc_precio).round(2)
             )
             @updated += 1
             puts "Actualizado #{row[0]}" unless Rails.env.production?
@@ -120,9 +120,9 @@ class ImportTiresFromGane
             product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
             product.available_on = hoy - 1.day
             #product.count_on_hand = set_stock(row[1])
-            product.price = (row[4].to_f + @inc_precio).round(2) #falta de poner el precio de venta segun cliente
-            product.cost_price = row[4].to_f
-            product.price_in_offert = (row[2].to_f + @inc_precio).round(2)
+            product.price = (row[4].to_f * 1.21 + @inc_precio).round(2) #falta de poner el precio de venta segun cliente
+            product.cost_price = row[4].to_f * 1.21
+            product.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(2)
             product.show_in_offert = row[3].to_f > 0 ? true : false
             product.supplier_id = 1045
             product.tire_width_id = set_width(result)
