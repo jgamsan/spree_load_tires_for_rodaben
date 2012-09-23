@@ -90,7 +90,7 @@ class ImportTiresFromEurotyre
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
-          variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4])
+          variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
           articulo = Spree::Product.find(variante.product_id)
           articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
           if row[7].empty?
