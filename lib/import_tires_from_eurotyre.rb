@@ -8,7 +8,6 @@ class ImportTiresFromEurotyre
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-eurotyre.csv"
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
-    #@file_old = "listado-eurotyre-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -90,10 +89,10 @@ class ImportTiresFromEurotyre
     productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
-        if productos.include?(row[6]) # producto existe
-          articulo = Spree::Product.find_by_name(row[6])
+        if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
+          variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4])
+          articulo = Spree::Product.find(variante.product_id)
           articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
-          variante = Spree::Variant.find_by_product_id(articulo.id)
           if row[7].empty?
             cost_price = row[8].to_f
             price = (row[8].to_f + @inc_precio).round(2)
