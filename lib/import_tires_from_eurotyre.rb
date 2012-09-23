@@ -18,7 +18,7 @@ class ImportTiresFromEurotyre
     @updated = 0
     @deleted = 0
     @readed = 0
-    @inc_precio = 7.95
+    @inc_precio = 9.95
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -94,17 +94,17 @@ class ImportTiresFromEurotyre
           articulo = Spree::Product.find(variante.product_id)
           articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
           if row[7].empty?
-            cost_price = row[8].to_f
-            price = (row[8].to_f + @inc_precio).round(2)
+            cost_price = row[8].to_f * 1.21
+            price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           else
-            cost_price = row[7].to_f
-            price = (row[7].to_f + @inc_precio).round(2)
+            cost_price = row[7].to_f * 1.21
+            price = (row[7].to_f * 1.21 + @inc_precio).round(2)
           end
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
               :count_on_hand => row[9],
-              :price_in_offert => (row[8].to_f + @inc_precio).round(2)
+              :price_in_offert => (row[8].to_f * 1.21 + @inc_precio).round(2)
           )
           @updated += 1
           puts "Actualizado #{row[6]}" unless Rails.env.production?
@@ -117,15 +117,15 @@ class ImportTiresFromEurotyre
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
           if row[7].empty?
-            cost_price = row[8].to_f
-            price = (row[8].to_f + @inc_precio).round(2)
+            cost_price = row[8].to_f * 1.21
+            price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           else
-            cost_price = row[7].to_f
-            price = (row[7].to_f + @inc_precio).round(2)
+            cost_price = row[7].to_f * 1.21
+            price = (row[7].to_f * 1.21 + @inc_precio).round(2)
           end
           product.price = price
           product.cost_price = cost_price
-          product.price_in_offert = (row[8].to_f + @inc_precio).round(2)
+          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(2)
           product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)
