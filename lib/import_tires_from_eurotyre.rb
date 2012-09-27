@@ -61,9 +61,9 @@ class ImportTiresFromEurotyre
         end
       end
       for i in 0..((ruedas.count/11) - 1)
-        @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
-                  ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9], ruedas[i*10 + 10]]
+        @total << [ruedas[i*11], ruedas[i*11 + 1], ruedas[i*11 + 2],
+                  ruedas[i*11 + 3], ruedas[i*11 + 4], ruedas[i*11 + 5],
+                  ruedas[i*11 + 6], ruedas[i*11 + 7], ruedas[i*11 + 8], ruedas[i*11 + 9], ruedas[i*11 + 10]]
         @readed += 1
       end
       ruedas.clear
