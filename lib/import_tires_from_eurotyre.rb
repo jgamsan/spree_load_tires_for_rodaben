@@ -142,19 +142,19 @@ class ImportTiresFromEurotyre
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, row[9])
+          v.update_column(:count_on_hand, row[10])
           add_image(product, @default_wd, @default_img)
           v = nil
           product = nil
           @created += 1
         end
       rescue Exception => e
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], e]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], e]
         next
       end
     end
     unless no_leidos.empty?
-      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
+      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "PVP", "Stock"]
       CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
