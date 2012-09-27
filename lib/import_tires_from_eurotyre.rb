@@ -60,7 +60,7 @@ class ImportTiresFromEurotyre
           ruedas << d.search(".//td")[i].text
         end
       end
-      for i in 0..(ruedas.count/10) - 1
+      for i in 0..(ruedas.count/10)
         @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
                   ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
                   ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9], ruedas[i*10 + 10]]
@@ -73,14 +73,14 @@ class ImportTiresFromEurotyre
   def export_to_csv
     CSV.open(File.join(@directory, @final), "wb") do |row|
       @total.each do |element|
-        #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+        #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
         row << element
       end
     end
   end
 
   def load_from_csv
-    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     result = []
     fallos = []
     no_leidos = []
@@ -164,7 +164,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_width(row)
-    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     ancho = Spree::TireWidth.find_by_name(row[0])
     if ancho.nil?
       raise "Este ancho no existe #{row[0]}"
