@@ -56,14 +56,14 @@ class ImportTiresFromEurotyre
       puts "Leyendo #{marca}" unless Rails.env.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-        for i in 0..9
+        for i in 0..10
           ruedas << d.search(".//td")[i].text
         end
       end
       for i in 0..(ruedas.count/10) - 1
         @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
                   ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
+                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9], ruedas[i*10 + 10]]
         @readed += 1
       end
       ruedas.clear
@@ -103,7 +103,7 @@ class ImportTiresFromEurotyre
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
-              :count_on_hand => row[9],
+              :count_on_hand => row[10],
               :price_in_offert => (row[8].to_f * 1.21 + @inc_precio).round(2)
           )
           @updated += 1
