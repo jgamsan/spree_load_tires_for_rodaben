@@ -32,7 +32,7 @@ class ImportTiresFromEurotyre
       read_from_eurotyre
       export_to_csv
       load_from_csv
-      delete_no_updated
+      #delete_no_updated
       send_mail
     end
   end
@@ -215,16 +215,17 @@ class ImportTiresFromEurotyre
   end
 
   def delete_no_updated
-    antiguo = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
-    nuevo = read_file(File.join(@directory, @final))
-    eliminar = antiguo - nuevo
-    eliminar.each do |element|
-      t = Spree::Product.find_by_name(element)
-      unless t.nil?
-        t.destroy
-        @deleted += 1
-      end
-    end
+
+#    antiguo = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
+#    nuevo = read_file(File.join(@directory, @final))
+#    eliminar = antiguo - nuevo
+#    eliminar.each do |element|
+#      t = Spree::Product.find_by_name(element)
+#      unless t.nil?
+#        t.destroy
+#        @deleted += 1
+#      end
+#    end
   end
 
   def read_file(file)

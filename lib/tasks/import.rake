@@ -11,4 +11,10 @@ namespace :products do
     require 'import_tires_from_eurotyre'
     ImportTiresFromEurotyre.new.run
   end
+
+  desc "Delete products from all suppliers no updated in 1 day minimun"
+  task :clean_rodaben => :environment do
+    require 'delete_tires_no_updated'
+    DeleteTiresNoUpdated.new.run
+  end
 end
