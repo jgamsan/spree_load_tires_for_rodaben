@@ -8,7 +8,6 @@ class ImportTiresFromEurotyre
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-eurotyre.csv"
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
-    #@file_old = "listado-eurotyre-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -57,14 +56,14 @@ class ImportTiresFromEurotyre
       puts "Leyendo #{marca}" unless Rails.env.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-        for i in 0..9
+        for i in 0..10
           ruedas << d.search(".//td")[i].text
         end
       end
-      for i in 0..(ruedas.count/10) - 1
-        @total << [ruedas[i*10], ruedas[i*10 + 1], ruedas[i*10 + 2],
-                  ruedas[i*10 + 3], ruedas[i*10 + 4], ruedas[i*10 + 5],
-                  ruedas[i*10 + 6], ruedas[i*10 + 7], ruedas[i*10 + 8], ruedas[i*10 + 9]]
+      for i in 0..((ruedas.count/11) - 1)
+        @total << [ruedas[i*11], ruedas[i*11 + 1], ruedas[i*11 + 2],
+                  ruedas[i*11 + 3], ruedas[i*11 + 4], ruedas[i*11 + 5],
+                  ruedas[i*11 + 6], ruedas[i*11 + 7].gsub(/\D/, "."), ruedas[i*11 + 8].gsub(/\D/, "."), ruedas[i*11 + 9], ruedas[i*11 + 10]]
         @readed += 1
       end
       ruedas.clear
@@ -74,14 +73,14 @@ class ImportTiresFromEurotyre
   def export_to_csv
     CSV.open(File.join(@directory, @final), "wb") do |row|
       @total.each do |element|
-        #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+        #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
         row << element
       end
     end
   end
 
   def load_from_csv
-    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     result = []
     fallos = []
     no_leidos = []
@@ -90,21 +89,21 @@ class ImportTiresFromEurotyre
     productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
-        if productos.include?(row[6]) # producto existe
-          articulo = Spree::Product.find_by_name(row[6])
+        if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
+          variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
+          articulo = Spree::Product.find(variante.product_id)
           articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
-          variante = Spree::Variant.find_by_product_id(articulo.id)
           if row[7].empty?
-            cost_price = row[8].to_f * 1.21
+            cost_price = (row[8].to_f * 1.21).round(2)
             price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           else
-            cost_price = row[7].to_f * 1.21
+            cost_price = (row[7].to_f * 1.21).round(2)
             price = (row[7].to_f * 1.21 + @inc_precio).round(2)
           end
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
-              :count_on_hand => row[9],
+              :count_on_hand => row[10],
               :price_in_offert => (row[8].to_f * 1.21 + @inc_precio).round(2)
           )
           @updated += 1
@@ -118,10 +117,10 @@ class ImportTiresFromEurotyre
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
           if row[7].empty?
-            cost_price = row[8].to_f * 1.21
+            cost_price = (row[8].to_f * 1.21).round(2)
             price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           else
-            cost_price = row[7].to_f * 1.21
+            cost_price = (row[7].to_f * 1.21).round(2)
             price = (row[7].to_f * 1.21 + @inc_precio).round(2)
           end
           product.price = price
@@ -143,19 +142,19 @@ class ImportTiresFromEurotyre
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, row[9])
+          v.update_column(:count_on_hand, row[10])
           add_image(product, @default_wd, @default_img)
           v = nil
           product = nil
           @created += 1
         end
       rescue Exception => e
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], e]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], e]
         next
       end
     end
     unless no_leidos.empty?
-      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
+      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "PVP", "Stock"]
       CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
@@ -165,7 +164,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_width(row)
-    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, stock]
+    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     ancho = Spree::TireWidth.find_by_name(row[0])
     if ancho.nil?
       raise "Este ancho no existe #{row[0]}"
