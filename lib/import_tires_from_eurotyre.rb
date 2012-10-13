@@ -19,6 +19,7 @@ class ImportTiresFromEurotyre
     @deleted = 0
     @readed = 0
     @inc_precio = 9.95
+    @num_columns = 10
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -59,10 +60,10 @@ class ImportTiresFromEurotyre
           ruedas << d.search(".//td")[i].text
         end
       end
-      for i in 0..((ruedas.count/11) - 1)
-        @total << [ruedas[i*11], ruedas[i*11 + 1], ruedas[i*11 + 2],
-                  ruedas[i*11 + 3], ruedas[i*11 + 4], ruedas[i*11 + 5],
-                  ruedas[i*11 + 6], ruedas[i*11 + 7].gsub(/\D/, "."), ruedas[i*11 + 8].gsub(/\D/, "."), ruedas[i*11 + 9], ruedas[i*11 + 10]]
+      for i in 0..((ruedas.count/@num_columns) - 1)
+        @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
+                  ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
+                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7].gsub(/\D/, "."), ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9]]
         @readed += 1
       end
       ruedas.clear
@@ -102,7 +103,7 @@ class ImportTiresFromEurotyre
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
-              :count_on_hand => row[10],
+              :count_on_hand => row[9],
               :price_in_offert => (row[8].to_f * 1.21 + @inc_precio).round(2)
           )
           @updated += 1
@@ -141,19 +142,19 @@ class ImportTiresFromEurotyre
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, row[10])
+          v.update_column(:count_on_hand, row[9])
           add_image(product, @default_wd, @default_img)
           v = nil
           product = nil
           @created += 1
         end
       rescue Exception => e
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], e]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], e]
         next
       end
     end
     unless no_leidos.empty?
-      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "PVP", "Stock"]
+      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
       CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
