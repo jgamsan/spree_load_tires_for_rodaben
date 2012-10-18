@@ -17,4 +17,11 @@ namespace :products do
     require 'delete_tires_no_updated'
     DeleteTiresNoUpdated.new.run
   end
+
+  desc "Import products of moto to spree database"
+  task :to_rodaben_moto => :environment do
+    require 'import_tires_of_moto'
+    ImportTiresOfMoto.new.run
+  end
+
 end
