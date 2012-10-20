@@ -66,10 +66,11 @@ class ImportTiresOfMoto
           end
           v = Spree::Variant.find_by_product_id(product.id)
           v.update_column(:count_on_hand, 6)
-          add_image(product, @default_wd, row[14])
+          add_image(product, @image_wd, row[14])
           v = nil
           product = nil
           @created += 1
+          puts "Created es igual a #{@created}" unless Rails.env.production?
         end
       rescue Exception => e
         no_leidos << [row[1], row[2], row[7], row[8], row[12], row[18], row[20], row[22], row[24], e]
