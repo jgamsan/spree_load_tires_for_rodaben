@@ -43,8 +43,8 @@ class ImportTiresOfMoto
           i += 1
           # crear uno nuevo
           product = Spree::Product.new
-          product.name = row[6]
-          product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
+          product.name = row[2]
+          product.permalink = row[2].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
           cost_price = (row[12].to_f * 1.21).round(2)
@@ -53,12 +53,12 @@ class ImportTiresOfMoto
           product.cost_price = price - @inc_precio
           product.price_in_offert = price
           product.show_in_offert = false
-          product.supplier_id = 4120
+          product.supplier_id = 2028
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)
           product.tire_speed_code_id = set_speed_code(row)
-          product.taxons << Spree::Taxon.find(4) #cargar categoria
+          product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
             puts "Creado articulo #{row[2]}" unless Rails.env.production?
