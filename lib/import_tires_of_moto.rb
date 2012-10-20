@@ -24,6 +24,8 @@ class ImportTiresOfMoto
 
   def load_from_csv
     hoy = Date.today
+    no_leidos = []
+    i = j = 0
     CSV.foreach(File.join(@directory, @file)) do |row|
       begin
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
@@ -35,6 +37,8 @@ class ImportTiresOfMoto
               :cost_price => price - @inc_precio,
               :price_in_offert => price
           )
+          @updated += 1
+          puts "Actualizado #{row[6]}" unless Rails.env.production?
         else
           i += 1
           # crear uno nuevo
