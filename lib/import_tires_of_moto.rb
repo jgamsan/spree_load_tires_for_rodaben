@@ -32,11 +32,9 @@ class ImportTiresOfMoto
           variante = Spree::Variant.search_moto_tire(row[1])
           cost_price = (row[12].to_f * 1.21).round(2)
           price = (row[12].to_f * 1.21 + @inc_precio).round(2)
-          variante.update_attributes(
-              :price => price,
-              :cost_price => price - @inc_precio,
-              :price_in_offert => price
-          )
+          variante.update_column(:cost_price, price - @inc_precio)
+          variante.update_column(:price, price)
+          variante.update_attributes(:price_in_offert => price)
           @updated += 1
           puts "Actualizado #{row[2]}" unless Rails.env.production?
         else
