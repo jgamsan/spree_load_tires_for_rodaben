@@ -38,7 +38,7 @@ class ImportTiresOfMoto
               :price_in_offert => price
           )
           @updated += 1
-          puts "Actualizado #{row[6]}" unless Rails.env.production?
+          puts "Actualizado #{row[2]}" unless Rails.env.production?
         else
           i += 1
           # crear uno nuevo
