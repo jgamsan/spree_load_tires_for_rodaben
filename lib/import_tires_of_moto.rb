@@ -6,7 +6,7 @@ class ImportTiresOfMoto
   def initialize()
     @directory = "#{Rails.root}/vendor/products"
     @file = "datos.csv"
-    @image_wd = "#{Rails.root}/vendor/products/images/pic"
+    @image_wd = "#{Rails.root}/vendor/products/images/pic/"
     @send_file = "listado-neumaticos-no-incorporados-moto.csv"
     @created = 0
     @updated = 0
