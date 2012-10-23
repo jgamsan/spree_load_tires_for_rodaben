@@ -63,7 +63,7 @@ class ImportTiresFromEurotyre
       for i in 0..(ruedas.count/@num_columns)
         @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
                   ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
-                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7].gsub(/\D/, "."), ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9]]
+                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9]]
         @readed += 1
       end
       ruedas.clear
