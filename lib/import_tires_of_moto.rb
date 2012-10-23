@@ -45,10 +45,10 @@ class ImportTiresOfMoto
           product.permalink = row[2].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
-          cost_price = row[12].to_f * 1.21
-          price = row[12].to_f * 1.21 + @inc_precio
+          cost_price = (row[12].to_f * 1.21).round(1)
+          price = (row[12].to_f * 1.21 + @inc_precio).round(1)
           product.price = price
-          product.cost_price = price - @inc_precio
+          product.cost_price = (price - @inc_precio).round(1)
           product.price_in_offert = price
           product.show_in_offert = false
           product.supplier_id = 2028
