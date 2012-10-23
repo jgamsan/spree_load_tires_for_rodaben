@@ -119,9 +119,9 @@ class ImportTiresFromGane
             product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
             product.available_on = hoy - 1.day
             #product.count_on_hand = set_stock(row[1])
-            product.price = (row[4].to_f * 1.21 + @inc_precio).round(2) #falta de poner el precio de venta segun cliente
+            product.price = (row[4].to_f * 1.21 + @inc_precio).round(1) #falta de poner el precio de venta segun cliente
             product.cost_price = row[4].to_f * 1.21
-            product.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(2)
+            product.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(1)
             product.show_in_offert = row[3].to_f > 0 ? true : false
             product.supplier_id = 1045
             product.tire_width_id = set_width(result)

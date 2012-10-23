@@ -117,15 +117,15 @@ class ImportTiresFromEurotyre
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
           if row[7].empty?
-            cost_price = (row[8].to_f * 1.21).round(2)
-            price = (row[8].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[8].to_f * 1.21).round(1)
+            price = (row[8].to_f * 1.21 + @inc_precio).round(1)
           else
-            cost_price = (row[7].to_f * 1.21).round(2)
-            price = (row[7].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[7].to_f * 1.21).round(1)
+            price = (row[7].to_f * 1.21 + @inc_precio).round(1)
           end
           product.price = price
           product.cost_price = cost_price
-          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(2)
+          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(1)
           product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)
