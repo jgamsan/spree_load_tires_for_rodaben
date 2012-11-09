@@ -35,6 +35,8 @@ class ImportTiresOfMoto
           variante.update_column(:cost_price, price - @inc_precio)
           variante.update_column(:price, price)
           variante.update_attributes(:price_in_offert => price)
+          product = Spree::Product.find(variante.product_id)
+          add_image(product, @image_wd, row[14])
           @updated += 1
           puts "Actualizado #{row[2]}" unless Rails.env.production?
         else
