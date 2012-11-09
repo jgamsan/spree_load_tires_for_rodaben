@@ -56,14 +56,14 @@ class ImportTiresFromEurotyre
       puts "Leyendo #{marca}" unless Rails.env.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-        for i in 0..10
+        for i in 0..9
           ruedas << d.search(".//td")[i].text
         end
       end
       for i in 0..((ruedas.count/@num_columns) - 1)
         @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
                   ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
-                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7].gsub(/\D/, "."), ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9]]
+                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9]]
         @readed += 1
       end
       ruedas.clear
@@ -117,15 +117,15 @@ class ImportTiresFromEurotyre
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
           if row[7].empty?
-            cost_price = (row[8].to_f * 1.21).round(2)
-            price = (row[8].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[8].to_f * 1.21).round(1)
+            price = (row[8].to_f * 1.21 + @inc_precio).round(1)
           else
-            cost_price = (row[7].to_f * 1.21).round(2)
-            price = (row[7].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[7].to_f * 1.21).round(1)
+            price = (row[7].to_f * 1.21 + @inc_precio).round(1)
           end
           product.price = price
           product.cost_price = cost_price
-          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(2)
+          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(1)
           product.show_in_offert = row[7].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)

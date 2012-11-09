@@ -145,10 +145,12 @@ class ImportTiresOfMoto
   end
 
   def add_image(product, dir, file)
-    type = file.split(".").last
-    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
-    i.viewable = product.master
-    i.save
+    if File.exist?(dir+file)
+      type = file.split(".").last
+      i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
+      i.viewable = product.master
+      i.save
+    end
   end
 
 
