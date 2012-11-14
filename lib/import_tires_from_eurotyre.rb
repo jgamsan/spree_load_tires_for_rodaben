@@ -56,7 +56,7 @@ class ImportTiresFromEurotyre
       puts "Leyendo #{marca}" unless Rails.env.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
-        for i in 0..9
+        for i in 0..11
           ruedas << d.search(".//td")[i].text
         end
       end
