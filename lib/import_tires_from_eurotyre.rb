@@ -19,7 +19,7 @@ class ImportTiresFromEurotyre
     @deleted = 0
     @readed = 0
     @inc_precio = 9.95
-    @num_columns = 11
+    @num_columns = 12
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -63,7 +63,7 @@ class ImportTiresFromEurotyre
       for i in 0..((ruedas.count/@num_columns) - 1)
         @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
                   ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
-                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9], ruedas[i*@num_columns + 10]]
+                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8].gsub(/\D/, "."), ruedas[i*@num_columns + 9], ruedas[i*@num_columns + 10], ruedas[i*@num_columns + 11]]
         @readed += 1
       end
       ruedas.clear
