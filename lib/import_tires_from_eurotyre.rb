@@ -19,7 +19,7 @@ class ImportTiresFromEurotyre
     @deleted = 0
     @readed = 0
     @inc_precio = 9.95
-    @num_columns = 10
+    @num_columns = 11
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -73,14 +73,14 @@ class ImportTiresFromEurotyre
   def export_to_csv
     CSV.open(File.join(@directory, @final), "wb") do |row|
       @total.each do |element|
-        #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
+        #[ancho, perfil, llanta, ic, iv, marca, modelo, foto, oferta, precio, stock, Barcelona]
         row << element
       end
     end
   end
 
   def load_from_csv
-    #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
+    #[ancho, perfil, llanta, ic, iv, marca, modelo, foto, oferta, precio, stock, Barcelona]
     result = []
     fallos = []
     no_leidos = []
@@ -92,19 +92,19 @@ class ImportTiresFromEurotyre
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
           variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
           articulo = Spree::Product.find(variante.product_id)
-          articulo.update_column(:show_in_offert, row[7].empty? ? false : true)
+          articulo.update_column(:show_in_offert, row[8].empty? ? false : true)
           if row[7].empty?
+            cost_price = (row[9].to_f * 1.21).round(2)
+            price = (row[9].to_f * 1.21 + @inc_precio).round(2)
+          else
             cost_price = (row[8].to_f * 1.21).round(2)
             price = (row[8].to_f * 1.21 + @inc_precio).round(2)
-          else
-            cost_price = (row[7].to_f * 1.21).round(2)
-            price = (row[7].to_f * 1.21 + @inc_precio).round(2)
           end
           variante.update_column(:cost_price, cost_price)
           variante.update_column(:price, price)
           variante.update_attributes(
-              :count_on_hand => row[9],
-              :price_in_offert => (row[8].to_f * 1.21 + @inc_precio).round(2)
+              :count_on_hand => row[10],
+              :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2)
           )
           @updated += 1
           puts "Actualizado #{row[6]}" unless Rails.env.production?
@@ -116,17 +116,17 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
-          if row[7].empty?
+          if row[8].empty?
+            cost_price = (row[9].to_f * 1.21).round(1)
+            price = (row[9].to_f * 1.21 + @inc_precio).round(1)
+          else
             cost_price = (row[8].to_f * 1.21).round(1)
             price = (row[8].to_f * 1.21 + @inc_precio).round(1)
-          else
-            cost_price = (row[7].to_f * 1.21).round(1)
-            price = (row[7].to_f * 1.21 + @inc_precio).round(1)
           end
           product.price = price
           product.cost_price = cost_price
-          product.price_in_offert = (row[8].to_f * 1.21 + @inc_precio).round(1)
-          product.show_in_offert = row[7].empty? ? false : true
+          product.price_in_offert = (row[9].to_f * 1.21 + @inc_precio).round(1)
+          product.show_in_offert = row[8].empty? ? false : true
           product.supplier_id = 2027
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
@@ -142,14 +142,14 @@ class ImportTiresFromEurotyre
             j += 1
           end
           v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, row[9])
+          v.update_column(:count_on_hand, row[10])
           add_image(product, @default_wd, @default_img)
           v = nil
           product = nil
           @created += 1
         end
       rescue Exception => e
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], e]
+        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[8], row[9], row[10], e]
         next
       end
     end
