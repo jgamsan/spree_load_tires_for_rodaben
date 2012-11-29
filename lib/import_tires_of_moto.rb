@@ -46,7 +46,7 @@ class ImportTiresOfMoto
           i += 1
           # crear uno nuevo
           product = Spree::Product.new
-          product.name = row[2] + (row[16].empty? ? "" : row[16])
+          product.name = row[2] + (row[16].nil? ? "" : row[16])
           product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
