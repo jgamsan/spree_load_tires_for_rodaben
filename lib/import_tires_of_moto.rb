@@ -100,30 +100,45 @@ class ImportTiresOfMoto
 
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
-    ancho = Spree::TireWidth.find_by_name(row[17])
-    if ancho.nil?
-      raise "Este ancho no existe #{row[17]}"
+    if row[17].nil?
+      nil
     else
-      return ancho.id
+      ancho = Spree::TireWidth.find_by_name(row[17])
+      if ancho.nil?
+        raise "Este ancho no existe #{row[17]}"
+      else
+        return ancho.id
+      end
     end
+
   end
 
   def set_serial(row)
-    serie = Spree::TireSerial.find_by_name(row[19])
-    if serie.nil?
-      raise "Este perfil no existe #{row[19]}"
+    if row[19].nil?
+      nil
     else
-      return serie.id
+      serie = Spree::TireSerial.find_by_name(row[19])
+      if serie.nil?
+        raise "Este perfil no existe #{row[19]}"
+      else
+        return serie.id
+      end
     end
+
   end
 
   def set_innertube(row)
-    llanta = Spree::TireInnertube.find_by_name(row[21])
-    if llanta.nil?
-      raise "Esta llanta no existe #{row[21]}"
+    if row[21].nil?
+      nil
     else
-      return llanta.id
+      llanta = Spree::TireInnertube.find_by_name(row[21])
+      if llanta.nil?
+        raise "Esta llanta no existe #{row[21]}"
+      else
+        return llanta.id
+      end
     end
+
   end
 
   def set_speed_code(row)
