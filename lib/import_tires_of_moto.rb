@@ -36,7 +36,7 @@ class ImportTiresOfMoto
           product = Spree::Product.find(variante.product_id)
           if product.images.empty?
             add_image(product, @image_wd, row[13])
-          elsif product.images.first.attachment_file_name <> row[13]
+          elsif product.images.first.attachment_file_name != row[13]
             change_image(product, @image_wd, row[13])
           end
 
