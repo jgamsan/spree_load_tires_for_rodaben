@@ -13,7 +13,6 @@ class ImportTiresOfMoto
     @deleted = 0
     @readed = 0
     @total = []
-    @inc_precio = 9.95
     I18n.locale = 'es'
   end
 
@@ -30,27 +29,30 @@ class ImportTiresOfMoto
       begin
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
-          cost_price = row[12].to_f * 1.21
-          price = row[12].to_f * 1.21 + @inc_precio
-          variante.update_column(:cost_price, price - @inc_precio)
+          cost_price = price = row[12].to_f
+          variante.update_column(:cost_price, price)
           variante.update_column(:price, price)
           variante.update_attributes(:price_in_offert => price)
           product = Spree::Product.find(variante.product_id)
-          add_image(product, @image_wd, row[14])
+          if product.images.empty?
+            add_image(product, @image_wd, row[13])
+          elsif product.images.first.attachment_file_name <> row[13]
+            change_image(product, @image_wd, row[13])
+          end
+
           @updated += 1
           puts "Actualizado #{row[2]}" unless Rails.env.production?
         else
           i += 1
           # crear uno nuevo
           product = Spree::Product.new
-          product.name = row[2]
-          product.permalink = row[2].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
+          product.name = row[2] + (row[16].empty? ? "" : row[16])
+          product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
-          cost_price = (row[12].to_f * 1.21).round(1)
-          price = (row[12].to_f * 1.21 + @inc_precio).round(1)
+          cost_price = price = row[12].to_f
           product.price = price
-          product.cost_price = (price - @inc_precio).round(1)
+          product.cost_price = price
           product.price_in_offert = price
           product.show_in_offert = false
           product.supplier_id = 2028
@@ -66,19 +68,19 @@ class ImportTiresOfMoto
           end
           v = Spree::Variant.find_by_product_id(product.id)
           v.update_column(:count_on_hand, 6)
-          add_image(product, @image_wd, row[14])
+          add_image(product, @image_wd, row[13])
           v = nil
           product = nil
           @created += 1
           puts "Created es igual a #{@created}" unless Rails.env.production?
         end
       rescue Exception => e
-        no_leidos << [row[1], row[2], row[7], row[8], row[12], row[18], row[20], row[22], row[24], e]
+        no_leidos << [row[1], row[2], row[8], row[12], row[17], row[19], row[21], row[23], e]
         next
       end
     end
     unless no_leidos.empty?
-      headers_row = ["SKU", "Nombre", "Categoria", "Marca", "Precio", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
+      headers_row = ["SKU", "Nombre", "Marca", "Precio", "Ancho", "Perfil", "Llanta", "IV", "Error"]
       CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
@@ -98,39 +100,39 @@ class ImportTiresOfMoto
 
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
-    ancho = Spree::TireWidth.find_by_name(row[18])
+    ancho = Spree::TireWidth.find_by_name(row[17])
     if ancho.nil?
-      raise "Este ancho no existe #{row[18]}"
+      raise "Este ancho no existe #{row[17]}"
     else
       return ancho.id
     end
   end
 
   def set_serial(row)
-    serie = Spree::TireSerial.find_by_name(row[20])
+    serie = Spree::TireSerial.find_by_name(row[19])
     if serie.nil?
-      raise "Este perfil no existe #{row[20]}"
+      raise "Este perfil no existe #{row[19]}"
     else
       return serie.id
     end
   end
 
   def set_innertube(row)
-    llanta = Spree::TireInnertube.find_by_name(row[22])
+    llanta = Spree::TireInnertube.find_by_name(row[21])
     if llanta.nil?
-      raise "Esta llanta no existe #{row[22]}"
+      raise "Esta llanta no existe #{row[21]}"
     else
       return llanta.id
     end
   end
 
   def set_speed_code(row)
-    if row[24].nil?
+    if row[23].nil?
       nil
     else
-      vel = Spree::TireSpeedCode.find_by_name(row[24])
+      vel = Spree::TireSpeedCode.find_by_name(row[23])
       if vel.nil?
-        raise "Este Indice Velocidad no existe #{row[24]}"
+        raise "Este Indice Velocidad no existe #{row[23]}"
       else
         return vel.id
       end
@@ -153,6 +155,11 @@ class ImportTiresOfMoto
       i.viewable = product.master
       i.save
     end
+  end
+
+  def change_image(product, dir, file)
+    product.images.delete_all
+    add_image(product, dir, file)
   end
 
 
