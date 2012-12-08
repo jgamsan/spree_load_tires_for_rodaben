@@ -13,6 +13,7 @@ class ImportTiresOfMoto
     @deleted = 0
     @readed = 0
     @total = []
+    @tubes = %w(TL TT RU)
     I18n.locale = 'es'
   end
 
@@ -59,7 +60,10 @@ class ImportTiresOfMoto
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)
+          product.tire_load_code_id = set_load_code(row)
           product.tire_speed_code_id = set_speed_code(row)
+          product.tire_position = set_position(row)
+          product.tire_rf = set_rf(row)
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
@@ -177,5 +181,40 @@ class ImportTiresOfMoto
     add_image(product, dir, file)
   end
 
+  def set_load_code(row)
+    if row[22].nil?
+      nil
+    else
+      load_code = Spree::TireLoadCode.find_by_name(row[22])
+      if load_code.nil?
+        raise "Este Indice de Carga no existe #{row[22]}"
+      else
+        return load_code.id
+      end
+    end
+  end
+
+  def set_position(row)
+    if row[24].nil?
+      nil
+    else
+      case row[24]
+        when "F"
+          1
+        when "R"
+          2
+        else
+          3
+      end
+    end
+  end
+
+  def set_rf(row)
+    if row[25].nil?
+      nil
+    else
+      @tubes.index(row[25])
+    end
+  end
 
 end
