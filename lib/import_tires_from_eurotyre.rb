@@ -207,10 +207,15 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    brand = Spree::Taxon.where(:parent_id => 2, :name => row[5]).first #@taxons.fetch(row[5])
-    if brand.nil?
+    if row[5].nil?
       raise "Marca #{row[5]} no esta registrada"
     else
+      if row[5].include?(" ")
+        marca = row[5].split.join('-').downcase
+      else
+        marca = row[5].downcase
+      end
+      brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
       return brand.id
     end
   end

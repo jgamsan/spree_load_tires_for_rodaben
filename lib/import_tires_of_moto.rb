@@ -158,10 +158,15 @@ class ImportTiresOfMoto
   end
 
   def set_brand(row)
-    brand = Spree::Taxon.where(:parent_id => 2, :name => row[8]).first #@taxons.fetch(row[5])
-    if brand.nil?
+    if row[8].nil?
       raise "Marca #{row[8]} no esta registrada"
     else
+      if row[8].include?(" ")
+        marca = row[8].split.join('-').downcase
+      else
+        marca = row[8].downcase
+      end
+      brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
       return brand.id
     end
   end
