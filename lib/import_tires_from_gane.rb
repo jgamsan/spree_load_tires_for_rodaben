@@ -101,9 +101,11 @@ class ImportTiresFromGane
             variante = Spree::Variant.find_by_product_id(articulo.id)
             cost_price = row[2].to_f * 1.21
             price = (row[4].to_f * 1.21 + @inc_precio).round(2)
-            variante.update_column(:cost_price, cost_price)
-            variante.update_column(:price, price)
+#            variante.update_column(:cost_price, cost_price)
+#            variante.update_column(:price, price)
             variante.update_attributes(
+              :cost_price => cost_price,
+              :price => price,
               :count_on_hand => set_stock(row[1]),
               :price_in_offert => (row[2].to_f * 1.21 + @inc_precio).round(2)
             )
@@ -137,8 +139,8 @@ class ImportTiresFromGane
               puts "Creado articulo #{row[0]}" unless Rails.env.production?
               j += 1
             end
-            v = Spree::Variant.find_by_product_id(product.id)
-            v.update_column(:count_on_hand, set_stock(row[1]))
+            #v = Spree::Variant.find_by_product_id(product.id)
+            product.master.update_attributes(:count_on_hand => set_stock(row[1]))
             if row[5].nil?
               add_image(product, @default_wd, @default_img)
             else
@@ -299,7 +301,7 @@ class ImportTiresFromGane
   def read_taxon(rueda)
    str = rueda.split
    if str.include?("GOODYEAR") || (str.include?("GOOD") & str.include?("YEAR"))
-    inter = ["GOOD YEAR"]
+    inter = ["GOOD-YEAR"]
    else
     inter = str & @marcas
    end

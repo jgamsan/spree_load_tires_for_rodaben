@@ -91,8 +91,8 @@ class ImportTiresFromEurotyre
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
           variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
-          articulo = Spree::Product.find(variante.product_id)
-          articulo.update_column(:show_in_offert, row[8].empty? ? false : true)
+          #articulo = Spree::Product.find(variante.product_id)
+          variante.product.update_column(:show_in_offert, row[8].empty? ? false : true)
           if row[7].empty?
             cost_price = (row[9].to_f * 1.21).round(2)
             price = (row[9].to_f * 1.21 + @inc_precio).round(2)
@@ -100,9 +100,11 @@ class ImportTiresFromEurotyre
             cost_price = (row[8].to_f * 1.21).round(2)
             price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           end
-          variante.update_column(:cost_price, cost_price)
-          variante.update_column(:price, price)
+          #variante.update_column(:cost_price, cost_price)
+          #variante.update_column(:price, price)
           variante.update_attributes(
+              :price => price,
+              :cost_price => cost_price,
               :count_on_hand => row[10],
               :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2)
           )
@@ -141,8 +143,8 @@ class ImportTiresFromEurotyre
             puts "Creado articulo #{row[6]}" unless Rails.env.production?
             j += 1
           end
-          v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, row[10])
+          #v = Spree::Variant.find_by_product_id(product.id)
+          product.master.update_attributes(:count_on_hand => row[10])
           add_image(product, @default_wd, @default_img)
           v = nil
           product = nil
@@ -205,10 +207,15 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    brand = Spree::Taxon.where(:parent_id => 2, :name => row[5]).first #@taxons.fetch(row[5])
-    if brand.nil?
+    if row[5].nil?
       raise "Marca #{row[5]} no esta registrada"
     else
+      if row[5].include?(" ")
+        marca = row[5].split.join('-').downcase
+      else
+        marca = row[5].downcase
+      end
+      brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
       return brand.id
     end
   end

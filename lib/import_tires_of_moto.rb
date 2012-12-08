@@ -31,9 +31,12 @@ class ImportTiresOfMoto
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
           cost_price = price = row[12].to_f
-          variante.update_column(:cost_price, price)
-          variante.update_column(:price, price)
-          variante.update_attributes(:price_in_offert => price)
+#          variante.update_column(:cost_price, price)
+#          variante.update_column(:price, price)
+          variante.update_attributes(
+                  :price_in_offert => price,
+                  :price => price,
+                  :cost_price => cost_price)
           product = Spree::Product.find(variante.product_id)
           if product.images.empty?
             add_image(product, @image_wd, row[13])
@@ -70,8 +73,8 @@ class ImportTiresOfMoto
             puts "Creado articulo #{row[2]}" unless Rails.env.production?
             j += 1
           end
-          v = Spree::Variant.find_by_product_id(product.id)
-          v.update_column(:count_on_hand, 6)
+          #v = Spree::Variant.find_by_product_id(product.id)
+          product.master.update_attributes(:count_on_hand => 6)
           add_image(product, @image_wd, row[13])
           v = nil
           product = nil
@@ -159,10 +162,15 @@ class ImportTiresOfMoto
   end
 
   def set_brand(row)
-    brand = Spree::Taxon.where(:parent_id => 2, :name => row[8]).first #@taxons.fetch(row[5])
-    if brand.nil?
+    if row[8].nil?
       raise "Marca #{row[8]} no esta registrada"
     else
+      if row[8].include?(" ")
+        marca = row[8].split.join('-').downcase
+      else
+        marca = row[8].downcase
+      end
+      brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
       return brand.id
     end
   end
