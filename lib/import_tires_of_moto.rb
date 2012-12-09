@@ -221,7 +221,7 @@ class ImportTiresOfMoto
     if row[25].nil?
       nil
     else
-      @tubes.index(row[25])
+      @tubes.index(row[25]) + 1
     end
   end
 
