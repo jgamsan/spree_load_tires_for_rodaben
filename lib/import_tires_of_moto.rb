@@ -63,10 +63,10 @@ class ImportTiresOfMoto
           product.tire_width_id = set_width(row)
           product.tire_serial_id = set_serial(row)
           product.tire_innertube_id = set_innertube(row)
-          product.tire_load_code_id = set_load_code(row)
+          #product.tire_load_code_id = set_load_code(row)
           product.tire_speed_code_id = set_speed_code(row)
-          product.tire_position = set_position(row)
-          product.tire_rf = set_rf(row)
+          #product.tire_position = set_position(row)
+          #product.tire_rf = set_rf(row)
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
