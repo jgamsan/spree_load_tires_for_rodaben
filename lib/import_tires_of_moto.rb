@@ -163,7 +163,7 @@ class ImportTiresOfMoto
 
   def set_brand(row)
     if row[8].nil?
-      raise "Marca #{row[8]} no esta registrada"
+      raise "Sin Marca #{row[8]} no esta registrada"
     else
       if row[8].include?(" ")
         marca = row[8].split.join('-').downcase
@@ -171,7 +171,11 @@ class ImportTiresOfMoto
         marca = row[8].downcase
       end
       brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
-      return brand.id
+      if brand.nil?
+        raise "Marca #{row[8]} no esta registrada"
+      else
+        return brand.id
+      end
     end
   end
 
