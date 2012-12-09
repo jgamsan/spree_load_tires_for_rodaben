@@ -163,7 +163,7 @@ class ImportTiresOfMoto
 
   def set_brand(row)
     if row[8].nil?
-      raise "Sin Marca #{row[8]} no esta registrada"
+      raise "Sin Marca"
     else
       if row[8].include?(" ")
         marca = row[8].split.join('-').downcase
