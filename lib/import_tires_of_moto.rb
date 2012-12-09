@@ -204,7 +204,7 @@ class ImportTiresOfMoto
 
   def set_position(row)
     if row[24].nil?
-      nil
+      3
     else
       case row[24]
         when "F"
