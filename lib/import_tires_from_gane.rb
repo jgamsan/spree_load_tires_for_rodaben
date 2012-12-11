@@ -67,9 +67,7 @@ class ImportTiresFromGane
         @readed += 1
       end
       links.clear
-      page.search(sch).each do |link|
-        links << link[:href]
-      end
+      page.search(sch).each {|link| links << link[:href]}
       links = links.uniq
       str = links[0].to_s
       puts str unless Rails.env.production?
@@ -78,10 +76,8 @@ class ImportTiresFromGane
 
   def export_to_csv
     CSV.open(File.join(@directory, @final), "wb") do |row|
-      @total.each do |element|
-        #[nombre, stock, precio, descuento, precio final]
-        row << element
-      end
+      @total.each {|element| row << element}
+      #[nombre, stock, precio, descuento, precio final]
     end
   end
 
@@ -160,9 +156,7 @@ class ImportTiresFromGane
     unless no_leidos.empty?
       headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen", "Motivo"]
       CSV.open(File.join(@directory, @send_file), "wb") do |row|
-        no_leidos.each do |element|
-          row << element
-        end
+        no_leidos.each {|element| row << element}
       end
     end
   end
@@ -382,11 +376,9 @@ class ImportTiresFromGane
   def set_season(name)
     existe = 2
     @invierno.each do |element|
-      if name.include?(element)
-        existe = 1
-      end
+        existe = 1 if name.include?(element)
     end
-    return existe
+    existe
   end
 
   def set_brand(row)

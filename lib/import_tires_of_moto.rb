@@ -31,8 +31,6 @@ class ImportTiresOfMoto
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
           cost_price = price = row[12].to_f
-#          variante.update_column(:cost_price, price)
-#          variante.update_column(:price, price)
           variante.update_attributes(
                   :price_in_offert => price,
                   :price => price,
@@ -43,7 +41,6 @@ class ImportTiresOfMoto
           elsif product.images.first.attachment_file_name != row[13]
             change_image(product, @image_wd, row[13])
           end
-
           @updated += 1
           puts "Actualizado #{row[2]}" unless Rails.env.production?
         else
