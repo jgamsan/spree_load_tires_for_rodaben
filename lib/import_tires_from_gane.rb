@@ -72,7 +72,7 @@ class ImportTiresFromGane
       end
       links = links.uniq
       str = links[0].to_s
-      #puts str
+      puts str unless Rails.env.production?
     end
   end
 
