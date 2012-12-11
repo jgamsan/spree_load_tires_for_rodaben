@@ -61,20 +61,19 @@ class ImportTiresFromGane
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
             img = read_image(l) if Spree::Product.find_by_name(t).nil?
             puts "Leido #{t}" unless Rails.env.production? 
-            end
           end
-          @total << [t, s, p, k, pf, img]
-          @readed += 1
         end
+        @total << [t, s, p, k, pf, img]
+        @readed += 1
       end
-      links.clear
-      page.search(sch).each do |link|
-        links << link[:href]
-      end
-      links = links.uniq
-      str = links[0].to_s
-      #puts str
     end
+    links.clear
+    page.search(sch).each do |link|
+      links << link[:href]
+    end
+    links = links.uniq
+    str = links[0].to_s
+    #puts str
   end
 
   def export_to_csv
@@ -160,7 +159,7 @@ class ImportTiresFromGane
     end
     unless no_leidos.empty?
       headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen", "Motivo"]
-      CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
+      CSV.open(File.join(@directory, @send_file), "wb") do |row|
         no_leidos.each do |element|
           row << element
         end
@@ -173,7 +172,7 @@ class ImportTiresFromGane
     CSV.foreach(file) do |row|
       nuevos << row[0]
     end
-    return nuevos
+    nuevos
   end
 
   def send_mail
@@ -307,10 +306,8 @@ class ImportTiresFromGane
    else
     inter = str & @marcas
    end
-
    @taxons.fetch(inter[0])
    #@marcas.find_index(inter[0])
-
   end
 
   def read_tube(tube)
@@ -345,7 +342,6 @@ class ImportTiresFromGane
         return serie.id
       end
     end
-
   end
 
   def set_innertube(row)
@@ -459,5 +455,4 @@ class ImportTiresFromGane
     i.viewable = product.master
     i.save
   end
-
 end
