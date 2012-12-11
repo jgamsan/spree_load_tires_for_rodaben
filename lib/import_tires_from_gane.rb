@@ -127,7 +127,7 @@ class ImportTiresFromGane
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
             product.tire_speed_code_id = set_speed_code(result)
-            product.tire_rf = false
+            product.tire_rf = 
             product.tire_gr = result[6]
             product.tire_season = set_season(row[0])
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
@@ -308,7 +308,7 @@ class ImportTiresFromGane
     if tube.nil?
       nil
     else
-      @tubes.find_index(tube)
+      @tubes.find_index(tube) + 1
     end
   end
 
