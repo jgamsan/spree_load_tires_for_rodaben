@@ -66,14 +66,14 @@ class ImportTiresFromGane
         @total << [t, s, p, k, pf, img]
         @readed += 1
       end
+      links.clear
+      page.search(sch).each do |link|
+        links << link[:href]
+      end
+      links = links.uniq
+      str = links[0].to_s
+      #puts str
     end
-    links.clear
-    page.search(sch).each do |link|
-      links << link[:href]
-    end
-    links = links.uniq
-    str = links[0].to_s
-    #puts str
   end
 
   def export_to_csv
