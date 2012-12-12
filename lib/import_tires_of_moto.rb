@@ -30,7 +30,7 @@ class ImportTiresOfMoto
       begin
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
-          cost_price = price = row[12].to_f
+          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
           variante.update_attributes(
                   :price_in_offert => price,
                   :price => price,
@@ -55,7 +55,7 @@ class ImportTiresOfMoto
           product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
-          cost_price = price = row[12].to_f
+          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
           product.price = price
           product.cost_price = price
           product.price_in_offert = price
