@@ -35,7 +35,7 @@ class ImportTiresOfMoto
                   :price_in_offert => price,
                   :price => price,
                   :cost_price => cost_price,
-                  :tire_load_code => set_load_code(row),
+                  :tire_load_code_id => set_load_code(row),
                   :tire_position => set_position(row),
                   :tire_rf => set_rf(row)
                   )
