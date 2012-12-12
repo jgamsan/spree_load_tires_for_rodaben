@@ -34,7 +34,11 @@ class ImportTiresOfMoto
           variante.update_attributes(
                   :price_in_offert => price,
                   :price => price,
-                  :cost_price => cost_price)
+                  :cost_price => cost_price,
+                  :tire_load_code => set_load_code(row),
+                  :tire_position => set_position(row),
+                  :tire_rf => set_rf(row)
+                  )
           product = Spree::Product.find(variante.product_id)
           if product.images.empty?
             add_image(product, @image_wd, row[13])
