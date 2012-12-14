@@ -60,7 +60,7 @@ class ImportTiresFromGane
             k = r[2].to_s.delete("%").strip.gsub(/,/, '.').to_f
             pf = r[3].to_s.delete("€").strip.gsub(/,/, '.').to_f
             img = read_image(l) if Spree::Product.find_by_name(t).nil?
-            puts "Leido #{t}" unless Rails.env.production? 
+            puts "Leido #{t}" unless Rails.env.production?
           end
         end
         @total << [t, s, p, k, pf, img]
@@ -90,7 +90,7 @@ class ImportTiresFromGane
     hoy = Date.today
     productos = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
-      begin
+#      begin
         unless row[0].blank?
           if productos.include?(row[0]) # producto existe
             articulo = Spree::Product.find_by_name(row[0])
@@ -148,10 +148,10 @@ class ImportTiresFromGane
             @created += 1
           end
         end
-      rescue Exception => e
-        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], e]
-        next
-      end
+#      rescue Exception => e
+#        no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], e]
+#        next
+#      end
     end
     unless no_leidos.empty?
       headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen", "Motivo"]
