@@ -31,13 +31,13 @@ class ImportTiresFromGane
   end
 
   def run
-    if login
-      puts "Logueado en Gane correctamente"
-      read_from_gane
-      export_to_csv
+#    if login
+#      puts "Logueado en Gane correctamente"
+#      read_from_gane
+#      export_to_csv
       load_from_csv
       send_mail
-    end
+#    end
   end
 
   def read_from_gane
