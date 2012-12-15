@@ -8,7 +8,6 @@ class ImportTiresFromGane
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-gane.csv"
     @send_file = "listado-neumaticos-no-incorporados-gane.csv"
-    #@file_old = "listado-gane-antiguo.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -31,13 +30,13 @@ class ImportTiresFromGane
   end
 
   def run
-#    if login
-#      puts "Logueado en Gane correctamente"
-#      read_from_gane
-#      export_to_csv
+    if login
+      puts "Logueado en Gane correctamente"
+      read_from_gane
+      export_to_csv
       load_from_csv
       send_mail
-#    end
+    end
   end
 
   def read_from_gane
@@ -46,11 +45,13 @@ class ImportTiresFromGane
     links = []
     until str.empty?
       page = @agent.get(str)
-      page.search(".//table[@class='tableBox_output']//tr").each do |d|
-        ti = d.search("td[@width='900']//a")
+      d = page.search(".//table[@class='tableBox_output']//tr")
+      i = 2
+      while i <= d.size - 3
+        ti = d[i].search("td[@width='900']//a")
         t = ti.text.strip
         l = ti.map {|x| x[:href]}
-        r = d.search("td//span[@class='linCat']").map {|x| x.text}
+        r = d[i].search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
           if r[1] == "Consultar"
               p = k = pf = s = 0
@@ -63,6 +64,7 @@ class ImportTiresFromGane
             puts "Leido #{t}" unless Rails.env.production?
           end
         end
+        i += 3
         @total << [t, s, p, k, pf, img]
         @readed += 1
       end
