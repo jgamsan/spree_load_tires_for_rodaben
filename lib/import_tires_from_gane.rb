@@ -30,13 +30,13 @@ class ImportTiresFromGane
   end
 
   def run
-#    if login
-#      puts "Logueado en Gane correctamente"
-#      read_from_gane
-#      export_to_csv
+    if login
+      puts "Logueado en Gane correctamente"
+      read_from_gane
+      export_to_csv
       load_from_csv
       send_mail
-#    end
+    end
   end
 
   def read_from_gane
@@ -129,7 +129,7 @@ class ImportTiresFromGane
             product.tire_serial_id = set_serial(result)
             product.tire_innertube_id = set_innertube(result)
             product.tire_speed_code_id = set_speed_code(result)
-#            product.tire_rf = read_tube(result[4])
+#            product.tire_rf = result[4]
             product.tire_gr = result[6]
             product.tire_season = set_season(row[0])
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
