@@ -68,6 +68,8 @@ class ImportTiresOfMoto
           product.tire_speed_code_id = set_speed_code(row)
           product.tire_position = set_position(row)
           product.tire_rf = set_rf(row)
+          product.tire_green_rate_id = 1
+          product.shipping_category_id = 2
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!

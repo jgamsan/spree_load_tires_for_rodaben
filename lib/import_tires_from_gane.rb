@@ -132,6 +132,10 @@ class ImportTiresFromGane
 #            product.tire_rf = result[4]
             product.tire_gr = result[6]
             product.tire_season = set_season(row[0])
+            product.tire_green_rate_id = 2
+            product.tire_load_code_id = set_load_code(row)
+            product.tax_category_id = 1
+            product.shipping_category_id = 1
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!

@@ -48,6 +48,7 @@ class ImportTiresFromEurotyre
     str = "http://www.eurotyre.pt/shop/shop"
     page = @agent.get(str)
     ruedas = []
+    eco = []
     form = page.form('search')
     select_list = form.field_with(:name => "u_marca")
     list = form.field_with(:name => "u_marca").options
@@ -59,14 +60,19 @@ class ImportTiresFromEurotyre
         for i in 0..(@num_columns - 1)
           ruedas << d.search(".//td")[i].text
         end
+        d.search(".//td[@class='etiqueta']").each do |p|
+          eco << p.search(".//span").text
+        end
       end
       for i in 0..((ruedas.count/@num_columns) - 1)
         @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
                   ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
-                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8], ruedas[i*@num_columns + 9].gsub(/\D/, "."), ruedas[i*@num_columns + 10], ruedas[i*@num_columns + 11]]
+                  ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8],
+                  ruedas[i*@num_columns + 9].gsub(/\D/, "."), ruedas[i*@num_columns + 10], ruedas[i*@num_columns + 11], eco[i]]
         @readed += 1
       end
       ruedas.clear
+      eco.clear
     end
   end
 
@@ -137,6 +143,14 @@ class ImportTiresFromEurotyre
           product.tire_rf = false
           product.tire_gr = false
           product.tire_season = 2
+          product.tire_fuel_consumption_id = set_fuel_consumption(row)
+          product.tire_wet_grip_id = set_wet_grip(row)
+          product.tire_rolling_noise_db = set_rolling_noise_db(row)
+          product.tire_rolling_noise_wave = set_rolling_noise_wave(row)
+          product.tire_green_rate_id = 2
+          product.tire_load_code_id = set_load_code(row)
+          product.tax_category_id = 1
+          product.shipping_category_id = 1
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
@@ -203,6 +217,64 @@ class ImportTiresFromEurotyre
       else
         return vel.id
       end
+    end
+  end
+
+  def set_load_code(row)
+    load_code = row[3]
+    if load_code =~ %r{(\d+)(?:/|:)(\d+)}
+      g = [$1,$2]
+      result =g[0]
+    else
+      result = load_code
+    end
+    load = Spree::TireLoadCode.find_by_name(result)
+    if load.nil?
+      raise "Este Indice de carga no existe #{load_code}"
+    else
+      return load.id
+    end
+  end
+
+  def set_fuel_consumption(row)
+    if row[12].nil
+      nil
+    else
+      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+      eco = [$1,$2,$3,$4]
+      fuel = Spree::TireFuelConsumption.find_by_name(eco[0])
+      fuel.id
+    end
+  end
+
+  def set_wet_grip(row)
+    if row[12].nil
+      nil
+    else
+      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+      eco = [$1,$2,$3,$4]
+      wet = Spree::TireWetGrip.find_by_name(eco[1])
+      wet.id
+    end
+  end
+
+  def set_rolling_noise_db(row)
+    if row[12].nil
+      nil
+    else
+      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+      eco = [$1,$2,$3,$4]
+      noise_db = eco[3].to_i
+    end
+  end
+
+  def set_rolling_noise_wave(row)
+    if row[12].nil
+      nil
+    else
+      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+      eco = [$1,$2,$3,$4]
+      noise_wave = eco[2].to_i
     end
   end
 
