@@ -118,7 +118,6 @@ class ImportTiresFromEurotyre
           puts "Actualizado #{row[6]}" unless Rails.env.production?
         else
           i += 1
-          # crear uno nuevo
           product = Spree::Product.new
           product.name = row[6]
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
