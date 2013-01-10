@@ -28,12 +28,12 @@ class ImportTiresFromEurotyre
   end
 
   def run
-    if login
-      read_from_eurotyre
-      export_to_csv
+#    if login
+#     read_from_eurotyre
+#     export_to_csv
       load_from_csv
       send_mail
-    end
+#   end
   end
 
   def login
@@ -240,7 +240,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_fuel_consumption(row)
-    if row[12].nil
+    if row[12].empty?
       nil
     else
       row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
@@ -251,7 +251,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_wet_grip(row)
-    if row[12].nil
+    if row[12].empty?
       nil
     else
       row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
@@ -262,7 +262,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_rolling_noise_db(row)
-    if row[12].nil
+    if row[12].empty
       nil
     else
       row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
@@ -272,7 +272,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_rolling_noise_wave(row)
-    if row[12].nil
+    if row[12].empty
       nil
     else
       row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
