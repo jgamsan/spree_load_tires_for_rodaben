@@ -28,12 +28,12 @@ class ImportTiresFromEurotyre
   end
 
   def run
-#    if login
-#     read_from_eurotyre
-#     export_to_csv
+    if login
+      read_from_eurotyre
+      export_to_csv
       load_from_csv
       send_mail
-#   end
+    end
   end
 
   def login
