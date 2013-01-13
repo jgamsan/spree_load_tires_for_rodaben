@@ -20,6 +20,9 @@ class ImportTiresFromEurotyre
     @readed = 0
     @inc_precio = 9.95
     @num_columns = 12
+    @green_rate = Spree::TireGreenRate.find_by_cat("B").id
+    @shipping_category = Spree::ShippingCategory.where("name like '%Automovil%'").first.id
+    @tax_category = Spree::TaxCategory.where("name like '%Ecotasa%'").first.id
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -150,10 +153,10 @@ class ImportTiresFromEurotyre
           product.tire_wet_grip_id = set_wet_grip(row)
           product.tire_rolling_noise_db = set_rolling_noise_db(row)
           product.tire_rolling_noise_wave = set_rolling_noise_wave(row)
-          product.tire_green_rate_id = 2
+          product.tire_green_rate_id = @green_rate
           product.tire_load_code_id = set_load_code(row)
-          product.tax_category_id = 1
-          product.shipping_category_id = 1
+          product.tax_category_id = @tax_category
+          product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
