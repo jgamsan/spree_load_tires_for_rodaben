@@ -20,6 +20,9 @@ class ImportTiresFromGane
     @readed = 0
     @inc_precio = 9.95
     @tubes = %w(TL TT RU)
+    @green_rate = Spree::TireGreenRate.find_by_cat("B").id
+    @shipping_category = Spree::ShippingCategory.where("name like '%Automovil%'").first.id
+    @tax_category = Spree::TaxCategory.where("name like '%Ecotasa%'").first.id
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
@@ -132,10 +135,10 @@ class ImportTiresFromGane
 #            product.tire_rf = result[4]
             product.tire_gr = result[6]
             product.tire_season = set_season(row[0])
-            product.tire_green_rate_id = 2
+            product.tire_green_rate_id = @green_rate
             product.tire_load_code_id = set_load_code(row)
-            product.tax_category_id = 1
-            product.shipping_category_id = 1
+            product.tax_category_id = @tax_category
+            product.shipping_category_id = @shipping_category
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
             if product.save!
