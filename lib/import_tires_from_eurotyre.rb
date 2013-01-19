@@ -10,7 +10,7 @@ class ImportTiresFromEurotyre
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
-    @default_img = "default.png"
+    @default_img = "default.jpg"
     @total = []
     @no_leidos = []
     @horario = []
@@ -23,6 +23,8 @@ class ImportTiresFromEurotyre
     @green_rate = Spree::TireGreenRate.find_by_cat("B").id
     @shipping_category = Spree::ShippingCategory.where("name like '%Automovil%'").first.id
     @tax_category = Spree::TaxCategory.where("name like '%Ecotasa%'").first.id
+    @fuel_options = Hash["A", "-14-55", "B", "-13-33", "C", "-13-11", "D", "-13+11", "E", "-13+33", "F", "-13+55", "G", "-13+77"]
+    @wet_options = Hash["A", "+103-53", "B", "+103-31", "C", "+103-9", "D", "+103+13", "E", "+103+35", "F", "+103+56", "G", "+103+78"]
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -166,6 +168,7 @@ class ImportTiresFromEurotyre
           #v = Spree::Variant.find_by_product_id(product.id)
           product.master.update_attributes(:count_on_hand => row[10])
           add_image(product, @default_wd, @default_img)
+          modify_cee_label_image(product, row) unless row(12).empty?
           v = nil
           product = nil
           @created += 1
@@ -320,5 +323,36 @@ class ImportTiresFromEurotyre
     i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
     i.viewable = product.master
     i.save
+  end
+
+  def modify_cee_label_image(product, row)
+    imagen = product.images.first.id
+    fuel = product.master.tire_fuel_consumption.name
+    wet = product.master.tire_wet_grip.name
+    noise_db = product.master.tire_rolling_noise_db
+    noise_wave = product.master.tire_rolling_noise_wave
+    unless imagen.attachment.path(:ceelabel).empty?
+      image = MiniMagick::Image.open(imagen.attachment.path(:ceelabel))
+      result = image.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.jpg"), "jpg") do |c|
+        c.gravity "center"
+        c.geometry @fuel_options[fuel]
+      end
+      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.jpg", "jpg")) do |c|
+        c.gravity "center"
+        c.geometry @wet_options[wet]
+      end
+      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.jpg", "jpg")) do |c|
+        c.gravity "center"
+        c.geometry "-30+165"
+      end
+      result.combine_options do |c|
+        c.gravity "center"
+        c.pointsize '30'
+        c.draw "text 60,168 '#{noise_db}'"
+        c.font 'arial'
+        c.fill "#FFFFFF"
+      end
+      result.write(imagen.attachment.path(:ceelabel))
+    end
   end
 end
