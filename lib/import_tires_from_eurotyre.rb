@@ -10,7 +10,7 @@ class ImportTiresFromEurotyre
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
-    @default_img = "default.jpg"
+    @default_img = "default.png"
     @total = []
     @no_leidos = []
     @horario = []
