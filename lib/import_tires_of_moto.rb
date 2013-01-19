@@ -14,6 +14,8 @@ class ImportTiresOfMoto
     @readed = 0
     @total = []
     @tubes = %w(TL TT RU)
+    @green_rate = Spree::TireGreenRate.find_by_cat("A").id
+    @shipping_category = Spree::ShippingCategory.where("name like '%Motos%'").first.id
     I18n.locale = 'es'
   end
 
@@ -69,7 +71,7 @@ class ImportTiresOfMoto
           product.tire_position = set_position(row)
           product.tire_rf = set_rf(row)
           product.tire_green_rate_id = 1
-          product.shipping_category_id = 2
+          product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
           if product.save!
