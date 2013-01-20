@@ -333,15 +333,15 @@ class ImportTiresFromEurotyre
     noise_wave = product.master.tire_rolling_noise_wave
     unless imagen.attachment.path(:ceelabel).empty?
       image = MiniMagick::Image.open(imagen.attachment.path(:ceelabel))
-      result = image.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.jpg"), "jpg") do |c|
+      result = image.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.png"), "png") do |c|
         c.gravity "center"
         c.geometry @fuel_options[fuel]
       end
-      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.jpg", "jpg")) do |c|
+      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.png", "png")) do |c|
         c.gravity "center"
         c.geometry @wet_options[wet]
       end
-      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.jpg", "jpg")) do |c|
+      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.png", "png")) do |c|
         c.gravity "center"
         c.geometry "-30+165"
       end
@@ -353,6 +353,7 @@ class ImportTiresFromEurotyre
         c.fill "#FFFFFF"
       end
       result.write(imagen.attachment.path(:ceelabel))
+      puts "modificada etiqueta CEE con #{row[12]}"
     end
   end
 end
