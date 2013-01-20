@@ -24,4 +24,16 @@ namespace :products do
     ImportTiresOfMoto.new.run
   end
 
+  desc "Delete folders of Rodaben Products"
+  task :clean_folders_in_rodaben => :environment do
+    require 'clean_image_folders_of_rodaben'
+    CleanImageFoldersOfRodaben.new.run
+  end
+
+  desc "Create images for new added styles"
+  task :add_images_for_new_styles => :environment do
+    require 'add_images_new_styles'
+    AddImagesNewStyles.new.run
+  end
+
 end

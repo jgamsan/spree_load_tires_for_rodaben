@@ -326,7 +326,7 @@ class ImportTiresFromEurotyre
   end
 
   def modify_cee_label_image(product, row)
-    imagen = product.images.first.id
+    imagen = product.images.first
     fuel = product.master.tire_fuel_consumption.name
     wet = product.master.tire_wet_grip.name
     noise_db = product.master.tire_rolling_noise_db
