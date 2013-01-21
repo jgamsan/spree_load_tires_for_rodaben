@@ -132,6 +132,7 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
+          variant = Spree::Variant.new
           if row[8].empty?
             cost_price = (row[9].to_f * 1.21).round(1)
             price = (row[9].to_f * 1.21 + @inc_precio).round(1)
@@ -139,37 +140,39 @@ class ImportTiresFromEurotyre
             cost_price = (row[8].to_f * 1.21).round(1)
             price = (row[8].to_f * 1.21 + @inc_precio).round(1)
           end
-          product.price = price
-          product.cost_price = cost_price
-          product.price_in_offert = (row[9].to_f * 1.21 + @inc_precio).round(1)
-          product.show_in_offert = row[8].empty? ? false : true
-          product.supplier_id = 2027
-          product.tire_width_id = set_width(row)
-          product.tire_serial_id = set_serial(row)
-          product.tire_innertube_id = set_innertube(row)
-          product.tire_speed_code_id = set_speed_code(row)
-          product.tire_rf = false
-          product.tire_gr = false
-          product.tire_season = 2
-          product.tire_fuel_consumption_id = set_fuel_consumption(row)
-          product.tire_wet_grip_id = set_wet_grip(row)
-          product.tire_rolling_noise_db = set_rolling_noise_db(row)
-          product.tire_rolling_noise_wave = set_rolling_noise_wave(row)
-          product.tire_green_rate_id = @green_rate
-          product.tire_load_code_id = set_load_code(row)
+          variant.price = product.price = price
+          variant.cost_price = cost_price
+          variant.price_in_offert = (row[9].to_f * 1.21 + @inc_precio).round(1)
+          variant.show_in_offert = row[8].empty? ? false : true
+          variant.supplier_id = 2027
+          variant.tire_width_id = set_width(row)
+          variant.tire_serial_id = set_serial(row)
+          variant.tire_innertube_id = set_innertube(row)
+          variant.tire_speed_code_id = set_speed_code(row)
+          variant.tire_rf = false
+          variant.tire_gr = false
+          variant.tire_season = 2
+          variant.tire_fuel_consumption_id = set_fuel_consumption(row)
+          variant.tire_wet_grip_id = set_wet_grip(row)
+          variant.tire_rolling_noise_db = set_rolling_noise_db(row)
+          variant.tire_rolling_noise_wave = set_rolling_noise_wave(row)
+          variant.tire_green_rate_id = @green_rate
+          variant.tire_load_code_id = set_load_code(row)
+          variant.count_on_hand = row[10]
           product.tax_category_id = @tax_category
           product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(4) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
+
+          product.master = variant
+
           if product.save!
             puts "Creado articulo #{row[6]}" unless Rails.env.production?
             j += 1
           end
-          #v = Spree::Variant.find_by_product_id(product.id)
-          product.master.update_attributes(:count_on_hand => row[10])
-          add_image(product, @default_wd, @default_img)
+          add_image(variant, @default_wd, @default_img)
           modify_cee_label_image(product, row) unless row(12).empty?
-          v = nil
+          variante = nil
           product = nil
           @created += 1
         end
