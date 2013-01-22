@@ -170,7 +170,7 @@ class ImportTiresFromEurotyre
             j += 1
           end
           add_image(variant, @default_wd, @default_img)
-          modify_cee_label_image(product, row) unless row(12).empty?
+          modify_cee_label_image(variant, row) unless row(12).empty?
           variante = nil
           product = nil
           @created += 1
