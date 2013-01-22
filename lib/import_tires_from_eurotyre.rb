@@ -170,7 +170,7 @@ class ImportTiresFromEurotyre
             j += 1
           end
           add_image(variant, @default_wd, @default_img)
-          modify_cee_label_image(variant, row) unless row(12).empty?
+          modify_cee_label_image(variant, row) unless row[12].empty?
           variante = nil
           product = nil
           @created += 1
@@ -324,10 +324,6 @@ class ImportTiresFromEurotyre
     img = Spree::Image.new(:attachment => File.open(dir + file))
     img.save!
     variant.images << img
-    #type = file.split(".").last
-    #i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
-    #i.viewable = variant.master
-    #i.save
   end
 
   def modify_cee_label_image(variant, row)
@@ -353,7 +349,7 @@ class ImportTiresFromEurotyre
       c.gravity "center"
       c.pointsize '30'
       c.draw "text 60,168 '#{noise_db}'"
-      #c.font 'TimesNewRoman'
+      c.font 'arial'
       c.fill "#FFFFFF"
     end
     result.write(imagen.attachment.path(:ceelabel))
