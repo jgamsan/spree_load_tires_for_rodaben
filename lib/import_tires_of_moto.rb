@@ -41,11 +41,10 @@ class ImportTiresOfMoto
                   :tire_position => set_position(row),
                   :tire_rf => set_rf(row)
                   )
-          product = Spree::Product.find(variante.product_id)
-          if product.images.empty?
-            add_image(product, @image_wd, row[13])
+          if variante.images.empty?
+            add_image(variante, @image_wd, row[13])
           elsif product.images.first.attachment_file_name != row[13]
-            change_image(product, @image_wd, row[13])
+            change_image(variante, @image_wd, row[13])
           end
           @updated += 1
           puts "Actualizado #{row[2]}" unless Rails.env.production?
@@ -57,20 +56,22 @@ class ImportTiresOfMoto
           product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = row[1]
           product.available_on = hoy - 1.day
-          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
-          product.price = price
-          product.cost_price = price
-          product.price_in_offert = price
-          product.show_in_offert = false
           product.supplier_id = 2028
-          product.tire_width_id = set_width(row)
-          product.tire_serial_id = set_serial(row)
-          product.tire_innertube_id = set_innertube(row)
-          product.tire_load_code_id = set_load_code(row)
-          product.tire_speed_code_id = set_speed_code(row)
-          product.tire_position = set_position(row)
-          product.tire_rf = set_rf(row)
-          product.tire_green_rate_id = 1
+          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
+          variant = Spree::Variant.new
+          variant.price = price
+          variant.cost_price = price
+          variant.count_on_hand = 6
+          variant.price_in_offert = price
+          variant.show_in_offert = false
+          variant.tire_width_id = set_width(row)
+          variant.tire_serial_id = set_serial(row)
+          variant.tire_innertube_id = set_innertube(row)
+          variant.tire_load_code_id = set_load_code(row)
+          variant.tire_speed_code_id = set_speed_code(row)
+          variant.tire_position = set_position(row)
+          variant.tire_rf = set_rf(row)
+          variant.tire_green_rate_id = 1
           product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
@@ -78,10 +79,8 @@ class ImportTiresOfMoto
             puts "Creado articulo #{row[2]}" unless Rails.env.production?
             j += 1
           end
-          #v = Spree::Variant.find_by_product_id(product.id)
-          product.master.update_attributes(:count_on_hand => 6)
-          add_image(product, @image_wd, row[13])
-          v = nil
+          add_image(variant, @image_wd, row[13])
+          variant = nil
           product = nil
           @created += 1
           puts "Created es igual a #{@created}" unless Rails.env.production?
@@ -184,18 +183,17 @@ class ImportTiresOfMoto
     end
   end
 
-  def add_image(product, dir, file)
+  def add_image(variant, dir, file)
     if File.exist?(dir+file)
-      type = file.split(".").last
-      i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
-      i.viewable = product.master
-      i.save
+      img = Spree::Image.new(:attachment => File.open(dir + file))
+      img.save!
+      variant.images << img
     end
   end
 
-  def change_image(product, dir, file)
-    product.images.delete_all
-    add_image(product, dir, file)
+  def change_image(variant, dir, file)
+    variant.images.delete_all
+    add_image(variant, dir, file)
   end
 
   def set_load_code(row)

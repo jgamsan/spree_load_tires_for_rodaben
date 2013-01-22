@@ -103,8 +103,6 @@ class ImportTiresFromGane
             variante = Spree::Variant.find_by_product_id(articulo.id)
             cost_price = row[2].to_f * 1.21
             price = (row[4].to_f * 1.21 + @inc_precio).round(2)
-#            variante.update_column(:cost_price, cost_price)
-#            variante.update_column(:price, price)
             variante.update_attributes(
               :cost_price => cost_price,
               :price => price,
@@ -122,21 +120,24 @@ class ImportTiresFromGane
             product.permalink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
             product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
             product.available_on = hoy - 1.day
-            #product.count_on_hand = set_stock(row[1])
-            product.price = (row[4].to_f * 1.21 + @inc_precio).round(1) #falta de poner el precio de venta segun cliente
-            product.cost_price = row[4].to_f * 1.21
-            product.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(1)
             product.show_in_offert = row[3].to_f > 0 ? true : false
             product.supplier_id = 1045
-            product.tire_width_id = set_width(result)
-            product.tire_serial_id = set_serial(result)
-            product.tire_innertube_id = set_innertube(result)
-            product.tire_speed_code_id = set_speed_code(result)
-#            product.tire_rf = result[4]
-            product.tire_gr = result[6]
-            product.tire_season = set_season(row[0])
-            product.tire_green_rate_id = @green_rate
-            product.tire_load_code_id = set_load_code(row)
+
+            variant = Spree::Variant.new
+
+            variant.price = (row[4].to_f * 1.21 + @inc_precio).round(1) #falta de poner el precio de venta segun cliente
+            variant.cost_price = row[4].to_f * 1.21
+            variant.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(1)
+
+            variant.tire_width_id = set_width(result)
+            variant.tire_serial_id = set_serial(result)
+            variant.tire_innertube_id = set_innertube(result)
+            variant.tire_speed_code_id = set_speed_code(result)
+            variant.tire_gr = result[6]
+            variant.tire_season = set_season(row[0])
+            variant.tire_green_rate_id = @green_rate
+            variant.tire_load_code_id = set_load_code(row)
+            variant.count_on_hand = set_stock(row[1])
             product.tax_category_id = @tax_category
             product.shipping_category_id = @shipping_category
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
@@ -145,14 +146,12 @@ class ImportTiresFromGane
               puts "Creado articulo #{row[0]}" unless Rails.env.production?
               j += 1
             end
-            #v = Spree::Variant.find_by_product_id(product.id)
-            product.master.update_attributes(:count_on_hand => set_stock(row[1]))
             if row[5].nil?
-              add_image(product, @default_wd, @default_img)
+              add_image(variant, @default_wd, @default_img)
             else
-              add_image(product, @image_wd, row[5])
+              add_image(variant, @image_wd, row[5])
             end
-            v = nil
+            variant = nil
             product = nil
             @created += 1
           end
@@ -450,10 +449,9 @@ class ImportTiresFromGane
     end
   end
 
-  def add_image(product, dir, file)
-    type = file.split(".").last
-    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
-    i.viewable = product.master
-    i.save
+  def add_image(variant, dir, file)
+    img = Spree::Image.new(:attachment => File.open(dir + file))
+    img.save!
+    variant.images << img
   end
 end

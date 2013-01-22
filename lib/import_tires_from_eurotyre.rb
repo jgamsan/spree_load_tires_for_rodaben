@@ -129,6 +129,9 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
+          product.show_in_offert = row[8].empty? ? false : true
+          product.supplier_id = 2027
+
           variant = Spree::Variant.new
           if row[8].empty?
             cost_price = (row[9].to_f * 1.21).round(1)
@@ -140,8 +143,7 @@ class ImportTiresFromEurotyre
           variant.price = product.price = price
           variant.cost_price = cost_price
           variant.price_in_offert = (row[9].to_f * 1.21 + @inc_precio).round(1)
-          variant.show_in_offert = row[8].empty? ? false : true
-          variant.supplier_id = 2027
+
           variant.tire_width_id = set_width(row)
           variant.tire_serial_id = set_serial(row)
           variant.tire_innertube_id = set_innertube(row)
