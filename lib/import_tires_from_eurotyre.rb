@@ -102,7 +102,6 @@ class ImportTiresFromEurotyre
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
           variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
-          #articulo = Spree::Product.find(variante.product_id)
           variante.product.update_column(:show_in_offert, row[8].empty? ? false : true)
           if row[7].empty?
             cost_price = (row[9].to_f * 1.21).round(2)
@@ -111,8 +110,6 @@ class ImportTiresFromEurotyre
             cost_price = (row[8].to_f * 1.21).round(2)
             price = (row[8].to_f * 1.21 + @inc_precio).round(2)
           end
-          #variante.update_column(:cost_price, cost_price)
-          #variante.update_column(:price, price)
           variante.update_attributes(
               :price => price,
               :cost_price => cost_price,
@@ -321,42 +318,43 @@ class ImportTiresFromEurotyre
     end
   end
 
-  def add_image(product, dir, file)
-    type = file.split(".").last
-    i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
-    i.viewable = product.master
-    i.save
+  def add_image(variant, dir, file)
+    img = Spree::Image.new(:attachment => File.open(dir + file))
+    img.save!
+    variant.images << img
+    #type = file.split(".").last
+    #i = Spree::Image.new(:attachment => Rack::Test::UploadedFile.new(dir + file, "image/#{type}"))
+    #i.viewable = variant.master
+    #i.save
   end
 
-  def modify_cee_label_image(product, row)
-    imagen = product.images.first
-    fuel = product.master.tire_fuel_consumption.name
-    wet = product.master.tire_wet_grip.name
-    noise_db = product.master.tire_rolling_noise_db
-    noise_wave = product.master.tire_rolling_noise_wave
-    unless imagen.attachment.path(:ceelabel).empty?
-      image = MiniMagick::Image.open(imagen.attachment.path(:ceelabel))
-      result = image.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.png"), "png") do |c|
-        c.gravity "center"
-        c.geometry @fuel_options[fuel]
-      end
-      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.png", "png")) do |c|
-        c.gravity "center"
-        c.geometry @wet_options[wet]
-      end
-      result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.png", "png")) do |c|
-        c.gravity "center"
-        c.geometry "-30+165"
-      end
-      result.combine_options do |c|
-        c.gravity "center"
-        c.pointsize '30'
-        c.draw "text 60,168 '#{noise_db}'"
-        c.font 'arial'
-        c.fill "#FFFFFF"
-      end
-      result.write(imagen.attachment.path(:ceelabel))
-      puts "modificada etiqueta CEE con #{row[12]}"
+  def modify_cee_label_image(variant, row)
+    imagen = variant.images.first
+    fuel = variant.tire_fuel_consumption.name
+    wet = variant.tire_wet_grip.name
+    noise_db = variant.tire_rolling_noise_db
+    noise_wave = variant.tire_rolling_noise_wave
+    image = MiniMagick::Image.open(imagen.attachment.path(:ceelabel))
+    result = image.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.png"), "png") do |c|
+      c.gravity "center"
+      c.geometry @fuel_options[fuel]
     end
+    result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.png", "png")) do |c|
+      c.gravity "center"
+      c.geometry @wet_options[wet]
+    end
+    result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.png", "png")) do |c|
+      c.gravity "center"
+      c.geometry "-30+165"
+    end
+    result.combine_options do |c|
+      c.gravity "center"
+      c.pointsize '30'
+      c.draw "text 60,168 '#{noise_db}'"
+      #c.font 'TimesNewRoman'
+      c.fill "#FFFFFF"
+    end
+    result.write(imagen.attachment.path(:ceelabel))
+    puts "modificada etiqueta CEE con #{row[12]}"
   end
 end
