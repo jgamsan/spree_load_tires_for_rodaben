@@ -1,23 +1,54 @@
 class AddImagesNewStyles
   def initialize
     @wd = "#{Rails.root}/public/spree/products"
-    @images = []
+    @image = "#{Rails.root}/app/assets/images/base_etiqueta.png"
+    @offert_image = "#{Rails.root}/app/assets/images/yellow-m.png"
+    @new_image = "#{Rails.root}/app/assets/images/blue-m.png"
+    @list_folders = []
   end
 
   def run
-    get_total_images
-    add_images
+    get_total_folders
+    add_folders
     print_report
   end
 
-  def get_total_images
-    @images = Spree::Image.all
+  def get_total_folders
+    @list_folders = Dir.entries(@wd)
   end
 
-  def add_images
-    @images.each do |item|
-
+  def add_folders
+    for i in 2..@list_folders.count
+      folder = @wd + "/#{@list_folders[i]}"
+      unless Dir.exist?(folder + "/ceelabel")
+        create_ceelabel(folder)
+        create_newmark(folder)
+        create_offertmark(folder)
+      end
     end
+  end
+
+  def create_ceelabel(folder)
+    Dir.mkdir(folder + "/ceelabel")
+    FileUtils.cp("@image", folder + '/ceelabel/default.png')
+  end
+
+  def create_newmark(folder)
+    Dir.mkdir(folder + "/newmark")
+    image = MiniMagick::Image.open(folder + "/product/" + Dir.entries(folder + "/product").last)
+    result = image.composite(MiniMagick::Image.open(@new_image), "png") do |c|
+      c.gravity "NorthWest"
+    end
+    result.write(folder + "/newmark/default.png")
+  end
+
+  def create_offertmark(folder)
+    Dir.mkdir(folder + "/offertmark")
+    image = MiniMagick::Image.open(folder + "/product/" + Dir.entries(folder + "/product").last)
+    result = image.composite(MiniMagick::Image.open(@offert_image), "png") do |c|
+      c.gravity "NorthWest"
+    end
+    result.write(folder + "/offertmark/default.png")
   end
 
 end
