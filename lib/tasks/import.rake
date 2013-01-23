@@ -36,4 +36,10 @@ namespace :products do
     AddImagesNewStyles.new.run
   end
 
+  desc "Update CEE label in existing products"
+  task :update_ceelabel_in_rodaben => :environment do
+    require 'update_cee_label'
+    UpdateCeeLabel.new.run
+  end
+
 end
