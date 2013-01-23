@@ -10,7 +10,6 @@ class AddImagesNewStyles
   def run
     get_total_folders
     add_folders
-    print_report
   end
 
   def get_total_folders
