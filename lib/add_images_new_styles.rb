@@ -13,7 +13,7 @@ class AddImagesNewStyles
   end
 
   def get_total_folders
-    @list_folders = Dir.entries(@wd)
+    @list_folders = Dir.entries(@wd) - ["..", "."]
   end
 
   def add_folders
