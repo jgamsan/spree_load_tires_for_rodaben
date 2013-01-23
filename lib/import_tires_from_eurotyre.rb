@@ -353,6 +353,6 @@ class ImportTiresFromEurotyre
       c.fill "#FFFFFF"
     end
     result.write(imagen.attachment.path(:ceelabel))
-    puts "modificada etiqueta CEE con #{row[12]}".white.on_blue
+    puts "modificada etiqueta CEE con #{row[12]}".white.on_blue unless Rails.env.production?
   end
 end
