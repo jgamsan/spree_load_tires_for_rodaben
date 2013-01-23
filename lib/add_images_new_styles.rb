@@ -21,11 +21,16 @@ class AddImagesNewStyles
     for i in 2..@list_folders.count
       folder = @wd + "/#{@list_folders[i]}"
       unless Dir.exist?(folder + "/ceelabel")
-        create_ceelabel(folder)
-        create_newmark(folder)
-        create_offertmark(folder)
-        j += 1
-        print "Vamos por la carpeta #{i}. Creada carpeta #{j}\r".white.on_blue unless Rails.env.production?
+        begin
+          create_ceelabel(folder)
+          create_newmark(folder)
+          create_offertmark(folder)
+          j += 1
+          print "Vamos por la carpeta #{i}. Creada carpeta #{j}\r".white.on_blue unless Rails.env.production?
+        rescue Exception => e
+          puts "Error en la carpeta #{i}".white.on_red unless Rails.env.production?
+        end
+        
       end
     end
   end
