@@ -24,6 +24,7 @@ class AddImagesNewStyles
         create_ceelabel(folder)
         create_newmark(folder)
         create_offertmark(folder)
+        puts "Creada carpeta no existente #{i}".white.on_blue unless Rails.env.production?
       end
     end
   end
