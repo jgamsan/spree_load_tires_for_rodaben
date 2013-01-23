@@ -39,6 +39,7 @@ class AddImagesNewStyles
     result = image.composite(MiniMagick::Image.open(@new_image), "png") do |c|
       c.gravity "NorthWest"
     end
+    result.resize "240x240"
     result.write(folder + "/newmark/default.png")
   end
 
@@ -48,6 +49,7 @@ class AddImagesNewStyles
     result = image.composite(MiniMagick::Image.open(@offert_image), "png") do |c|
       c.gravity "NorthWest"
     end
+    result.resize "240x240"
     result.write(folder + "/offertmark/default.png")
   end
 
