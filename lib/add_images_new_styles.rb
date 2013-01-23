@@ -30,7 +30,7 @@ class AddImagesNewStyles
 
   def create_ceelabel(folder)
     Dir.mkdir(folder + "/ceelabel")
-    FileUtils.cp("@image", folder + '/ceelabel/default.png')
+    FileUtils.cp(@image, folder + '/ceelabel/default.png')
   end
 
   def create_newmark(folder)
