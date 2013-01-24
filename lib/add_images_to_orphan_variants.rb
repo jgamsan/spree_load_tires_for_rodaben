@@ -28,7 +28,7 @@ class AddImagesToOrphanVariants
           variant.images << img
           j += 1
         end
-        print "Ejecutando variante #{j} de un total de #{i}".white.on_blue
+        print "Ejecutando variante #{j}".white.on_blue
       else
         v.destroy
       end
