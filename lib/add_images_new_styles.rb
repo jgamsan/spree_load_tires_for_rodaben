@@ -22,42 +22,45 @@ class AddImagesNewStyles
       folder = @wd + "/#{@list_folders[i]}"
       unless Dir.exist?(folder + "/ceelabel")
         begin
-          create_ceelabel(folder)
-          create_newmark(folder)
-          create_offertmark(folder)
+          a = (Dir.entries(folder + "/product") - ["..", "."]).first
+          ext = File.extname(a)
+          name = File.basename(a, ext)
+          create_ceelabel(folder, name, ext)
+          create_newmark(folder, name, ext)
+          create_offertmark(folder, name, ext)
           j += 1
           print "Vamos por la carpeta #{i}. Creada carpeta #{j}\r".white.on_blue unless Rails.env.production?
         rescue Exception => e
           puts "Error en la carpeta #{i}".white.on_red unless Rails.env.production?
         end
-        
+
       end
     end
   end
 
-  def create_ceelabel(folder)
+  def create_ceelabel(folder, name, ext)
     Dir.mkdir(folder + "/ceelabel")
-    FileUtils.cp(@image, folder + '/ceelabel/default.png')
+    FileUtils.cp(@image, folder + "/ceelabel/#{name}.png")
   end
 
-  def create_newmark(folder)
+  def create_newmark(folder, name, ext)
     Dir.mkdir(folder + "/newmark")
-    image = MiniMagick::Image.open(folder + "/product/" + (Dir.entries(folder + "/product") - ["..", "."]).first)
+    image = MiniMagick::Image.open(folder + "/product/" + "#{name}.#{ext}")
     result = image.composite(MiniMagick::Image.open(@new_image), "png") do |c|
       c.gravity "NorthWest"
     end
     result.resize "240x240"
-    result.write(folder + "/newmark/default.png")
+    result.write(folder + "/newmark/#{name}.png")
   end
 
-  def create_offertmark(folder)
+  def create_offertmark(folder, name, ext)
     Dir.mkdir(folder + "/offertmark")
-    image = MiniMagick::Image.open(folder + "/product/" + (Dir.entries(folder + "/product") - ["..", "."]).first)
+    image = MiniMagick::Image.open(folder + "/product/" + "#{name}.#{ext}")
     result = image.composite(MiniMagick::Image.open(@offert_image), "png") do |c|
       c.gravity "NorthWest"
     end
     result.resize "240x240"
-    result.write(folder + "/offertmark/default.png")
+    result.write(folder + "/offertmark/#{name}.png")
   end
 
 end
