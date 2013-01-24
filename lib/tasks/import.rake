@@ -42,4 +42,10 @@ namespace :products do
     UpdateCeeLabel.new.run
   end
 
+  desc "Add images to variants without it"
+  task :add_images_to_orphan_variants => :environment do
+    require 'add_images_to_orphan_variants'
+    AddImagesToOrphanVariants.new.run
+  end
+
 end
