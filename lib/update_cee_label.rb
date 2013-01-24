@@ -49,6 +49,7 @@ class UpdateCeeLabel
         new_name = File.basename(n, File.extname(n)) + ".png"
         result.write(File.join(File.dirname(imagen.attachment.path(:ceelabel)), new_name))
       end
+      print "Producto #{p.name}".white.on_blue
     end
   end
 end
