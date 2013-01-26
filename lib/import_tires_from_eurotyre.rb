@@ -126,7 +126,7 @@ class ImportTiresFromEurotyre
         else
           i += 1
           product = Spree::Product.new
-          product.name = row[6]to_s.match(/^\d+$/).nil? ? row[6] : row[6] + "-#{row[0]}/#{row[1]}R#{row[2]}"
+          product.name = row[6].to_s.match(/^\d+$/).nil? ? row[6] : row[6] + "-#{row[0]}/#{row[1]}R#{row[2]}"
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
