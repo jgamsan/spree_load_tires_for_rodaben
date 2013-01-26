@@ -120,6 +120,7 @@ class ImportTiresFromEurotyre
               :tire_rolling_noise_db => set_rolling_noise_db(row),
               :tire_rolling_noise_wave => set_rolling_noise_wave(row)
           )
+          modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
           puts "Actualizado #{row[6]}" unless Rails.env.production?
         else
