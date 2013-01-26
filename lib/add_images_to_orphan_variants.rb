@@ -19,20 +19,25 @@ class AddImagesToOrphanVariants
 
   def assign_images
     j = 1
-    @diferencia.each do |v|
-      variant = Spree::Variant.find(v)
-      if Spree::Product.exists?(variant.product_id)
-        unless variant.product.is_moto?
-          img = Spree::Image.new(:attachment => File.open(@default))
-          img.save!
-          variant.images << img
-          j += 1
+    begin
+      @diferencia.each do |v|
+        variant = Spree::Variant.find(v)
+        if Spree::Product.exists?(variant.product_id)
+          unless variant.product.is_moto?
+            img = Spree::Image.new(:attachment => File.open(@default))
+            img.save!
+            variant.images << img
+            j += 1
+          end
+          print "Ejecutando variante #{j}".white.on_blue
+        else
+          variant.destroy
         end
-        print "Ejecutando variante #{j}".white.on_blue
-      else
-        variant.destroy
       end
+    rescue Exception => e
+      puts "Error en variante #{variant}".white.on_red unless Rails.env.production?
     end
+
   end
 
 

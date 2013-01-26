@@ -39,7 +39,11 @@ class ImportTiresOfMoto
                   :cost_price => cost_price,
                   :tire_load_code_id => set_load_code(row),
                   :tire_position => set_position(row),
-                  :tire_rf => set_rf(row)
+                  :tire_rf => set_rf(row),
+                  :tire_fuel_consumption_id => nil,
+                  :tire_wet_grip_id => nil,
+                  :tire_rolling_noise_db => nil,
+                  :tire_rolling_noise_wave => nil
                   )
           if variante.images.empty?
             add_image(variante, @image_wd, row[13])
@@ -72,6 +76,10 @@ class ImportTiresOfMoto
           variant.tire_position = set_position(row)
           variant.tire_rf = set_rf(row)
           variant.tire_green_rate_id = 1
+          variant.tire_fuel_consumption_id = nil
+          variant.tire_wet_grip_id = nil
+          variant.tire_rolling_noise_db = nil
+          variant.tire_rolling_noise_wave = nil
           product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca

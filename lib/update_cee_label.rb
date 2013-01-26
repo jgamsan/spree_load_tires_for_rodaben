@@ -17,39 +17,44 @@ class UpdateCeeLabel
 
   def rewrite_cee_label
     @products.each do |p|
-      unless p.master.cee_label == '????'
-        imagen = p.master.images.first
-        n = imagen.attachment.path(:product)
-        name = File.basename(n)
-        wd = File.dirname(n)
-        fuel = p.master.tire_fuel_consumption.name
-        wet = p.master.tire_wet_grip.name
-        noise_db = p.master.tire_rolling_noise_db
-        noise_wave = p.master.tire_rolling_noise_wave
-        i = MiniMagick::Image.open(@default)
-        result = i.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.png"), "png") do |c|
-          c.gravity "center"
-          c.geometry @fuel_options[fuel]
+      begin
+        unless p.master.cee_label == '????'
+          imagen = p.master.images.first
+          n = imagen.attachment.path(:product)
+          name = File.basename(n)
+          wd = File.dirname(n)
+          fuel = p.master.tire_fuel_consumption.name
+          wet = p.master.tire_wet_grip.name
+          noise_db = p.master.tire_rolling_noise_db
+          noise_wave = p.master.tire_rolling_noise_wave
+          i = MiniMagick::Image.open(@default)
+          result = i.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{fuel.downcase}.png"), "png") do |c|
+            c.gravity "center"
+            c.geometry @fuel_options[fuel]
+          end
+          result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.png", "png")) do |c|
+            c.gravity "center"
+            c.geometry @wet_options[wet]
+          end
+          result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.png", "png")) do |c|
+            c.gravity "center"
+            c.geometry "-30+165"
+          end
+          result.combine_options do |c|
+            c.gravity "center"
+            c.pointsize '30'
+            c.draw "text 60,168 '#{noise_db}'"
+            c.font 'arial'
+            c.fill "#FFFFFF"
+          end
+          new_name = File.basename(n, File.extname(n)) + ".png"
+          result.write(File.join(File.dirname(imagen.attachment.path(:ceelabel)), new_name))
         end
-        result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/#{wet.downcase}.png", "png")) do |c|
-          c.gravity "center"
-          c.geometry @wet_options[wet]
-        end
-        result = result.composite(MiniMagick::Image.open("#{Rails.root}/app/assets/images/emision_ruido_#{noise_wave}.png", "png")) do |c|
-          c.gravity "center"
-          c.geometry "-30+165"
-        end
-        result.combine_options do |c|
-          c.gravity "center"
-          c.pointsize '30'
-          c.draw "text 60,168 '#{noise_db}'"
-          c.font 'arial'
-          c.fill "#FFFFFF"
-        end
-        new_name = File.basename(n, File.extname(n)) + ".png"
-        result.write(File.join(File.dirname(imagen.attachment.path(:ceelabel)), new_name))
+        print "Producto #{p.name}\r".white.on_blue unless Rails.env.production?
+      rescue Exception => e
+        puts "Error en producto #{p}".white.on_red unless Rails.env.production?
       end
-      print "Producto #{p.name}\r".white.on_blue unless Rails.env.production?
+
     end
   end
 end
