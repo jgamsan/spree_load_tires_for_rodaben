@@ -107,7 +107,11 @@ class ImportTiresFromGane
               :cost_price => cost_price,
               :price => price,
               :count_on_hand => set_stock(row[1]),
-              :price_in_offert => (row[2].to_f * 1.21 + @inc_precio).round(2)
+              :price_in_offert => (row[2].to_f * 1.21 + @inc_precio).round(2),
+              :tire_fuel_consumption_id => nil,
+              :tire_wet_grip_id => nil,
+              :tire_rolling_noise_db => nil,
+              :tire_rolling_noise_wave => nil
             )
             @updated += 1
             puts "Actualizado #{row[0]}" unless Rails.env.production?
@@ -137,6 +141,10 @@ class ImportTiresFromGane
             variant.tire_season = set_season(row[0])
             variant.tire_green_rate_id = @green_rate
             variant.tire_load_code_id = set_load_code(row)
+            variant.tire_fuel_consumption_id = nil
+            variant.tire_wet_grip_id = nil
+            variant.tire_rolling_noise_db = nil
+            variant.tire_rolling_noise_wave = nil
             variant.count_on_hand = set_stock(row[1])
             product.tax_category_id = @tax_category
             product.shipping_category_id = @shipping_category
