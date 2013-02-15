@@ -114,11 +114,7 @@ class ImportTiresFromEurotyre
               :price => price,
               :cost_price => cost_price,
               :count_on_hand => row[10],
-              :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2),
-              :tire_fuel_consumption_id => set_fuel_consumption(row),
-              :tire_wet_grip_id => set_wet_grip(row),
-              :tire_rolling_noise_db => set_rolling_noise_db(row),
-              :tire_rolling_noise_wave => set_rolling_noise_wave(row)
+              :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2)
           )
           modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
