@@ -45,7 +45,7 @@ class AddImagesNewStyles
 
   def create_newmark(folder, name, ext)
     Dir.mkdir(folder + "/newmark")
-    image = MiniMagick::Image.open(folder + "/product/" + "#{name}.#{ext}")
+    image = MiniMagick::Image.open(folder + "/product/" + "#{name}#{ext}")
     image.resize "240x240"
     result = image.composite(MiniMagick::Image.open(@new_image), "png") do |c|
       c.gravity "NorthWest"
@@ -55,7 +55,7 @@ class AddImagesNewStyles
 
   def create_offertmark(folder, name, ext)
     Dir.mkdir(folder + "/offertmark")
-    image = MiniMagick::Image.open(folder + "/product/" + "#{name}.#{ext}")
+    image = MiniMagick::Image.open(folder + "/product/" + "#{name}#{ext}")
     image.resize "240x240"
     result = image.composite(MiniMagick::Image.open(@offert_image), "png") do |c|
       c.gravity "NorthWest"
