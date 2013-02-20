@@ -318,7 +318,7 @@ class ImportTiresFromEurotyre
   end
 
   def add_image(variant, dir, file)
-    img = Spree::Image.new(:attachment => File.open(dir + file))
+    img = Spree::Image.new(:attachment => File.open(dir + file), :viewable => variant}, :without_protection => true)
     img.save!
     variant.images << img
   end

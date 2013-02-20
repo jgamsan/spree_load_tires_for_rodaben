@@ -193,7 +193,7 @@ class ImportTiresOfMoto
 
   def add_image(variant, dir, file)
     if File.exist?(dir+file)
-      img = Spree::Image.new(:attachment => File.open(dir + file))
+      img = Spree::Image.new(:attachment => File.open(dir + file), :viewable => product}, :without_protection => true)
       img.save!
       variant.images << img
     end
