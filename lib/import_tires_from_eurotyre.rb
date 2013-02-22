@@ -8,6 +8,7 @@ class ImportTiresFromEurotyre
     @directory = "#{Rails.root}/vendor/products"
     @final = "listado-neumaticos-eurotyre.csv"
     @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
+    @logger = Logger.new(File.join(@directory, 'logfile.log'))
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = "default.png"
@@ -121,7 +122,11 @@ class ImportTiresFromEurotyre
           end
           modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
-          puts "Actualizado #{row[6]}" unless Rails.env.production?
+          if Rails.env.production?
+            @logger.info "Actualizado #{row[6]}"
+          else
+            puts "Actualizado #{row[6]}"white.on_blue
+          end
         else
           i += 1
           product = Spree::Product.new
@@ -166,7 +171,11 @@ class ImportTiresFromEurotyre
           product.master = variant
 
           if product.save!
-            puts "Creado articulo #{row[6]}" unless Rails.env.production?
+            if Rails.env.production?
+              @logger.info "Creado articulo #{row[6]}"
+            else
+              puts "Creado articulo #{row[6]}"white.on_blue
+            end
             j += 1
           end
           add_image(variant, @default_wd, @default_img)
@@ -178,6 +187,8 @@ class ImportTiresFromEurotyre
       rescue Exception => e
         puts "error en carga de datos #{row[6]}".white.on_red unless Rails.env.production?
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[8], row[9], row[10], e]
+        @logger.error("#{e.class.name}: #{e.message}")
+        @logger.error(e.backtrace * "\n")
         next
       end
     end
@@ -316,8 +327,8 @@ class ImportTiresFromEurotyre
     begin
       Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @directory, @send_file, "EUROTYRE").deliver
     rescue Exception => e
-      logger.error("#{e.class.name}: #{e.message}")
-      logger.error(e.backtrace * "\n")
+      @logger.error("#{e.class.name}: #{e.message}")
+      @logger.error(e.backtrace * "\n")
     end
   end
 
