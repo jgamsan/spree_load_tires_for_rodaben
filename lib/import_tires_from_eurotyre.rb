@@ -125,7 +125,7 @@ class ImportTiresFromEurotyre
           if Rails.env.production?
             @logger.info "Actualizado #{row[6]}"
           else
-            puts "Actualizado #{row[6]}"white.on_blue
+            puts "Actualizado #{row[6]}".white.on_blue
           end
         else
           i += 1
@@ -174,7 +174,7 @@ class ImportTiresFromEurotyre
             if Rails.env.production?
               @logger.info "Creado articulo #{row[6]}"
             else
-              puts "Creado articulo #{row[6]}"white.on_blue
+              puts "Creado articulo #{row[6]}".white.on_blue
             end
             j += 1
           end
