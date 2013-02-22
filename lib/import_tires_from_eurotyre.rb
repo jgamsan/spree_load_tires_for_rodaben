@@ -120,7 +120,7 @@ class ImportTiresFromEurotyre
           if variante.images.empty?
             add_image(variante, @default_wd, @default_img)
           end
-          modify_cee_label_image(variante, row) unless row[12].empty?
+          #modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
           if Rails.env.production?
             @logger.info "Actualizado #{row[6]}"
