@@ -116,6 +116,9 @@ class ImportTiresFromEurotyre
               :count_on_hand => row[10],
               :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2)
           )
+          if variante.images.empty?
+            add_image(variante, @default_wd, @default_img)
+          end
           modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
           puts "Actualizado #{row[6]}" unless Rails.env.production?
