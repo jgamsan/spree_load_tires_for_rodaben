@@ -146,6 +146,7 @@ class ImportTiresFromGane
             product.shipping_category_id = @shipping_category
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
+
             if product.save!
               puts "Creado articulo #{row[0]}" unless Rails.env.production?
               j += 1
@@ -454,7 +455,7 @@ class ImportTiresFromGane
   end
 
   def add_image(variant, dir, file)
-    img = Spree::Image.new(:attachment => File.open(dir + file), :viewable => variant, :without_protection => true)
+    img = Spree::Image.new({:attachment => File.open(dir + file), :viewable => variant}, :without_protection => true)
     img.save!
     variant.images << img
   end
