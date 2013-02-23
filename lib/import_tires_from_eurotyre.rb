@@ -134,7 +134,7 @@ class ImportTiresFromEurotyre
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
           product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
           product.available_on = hoy - 1.day
-          product.show_in_offert = row[8].empty? ? false : true
+          product.show_in_offert = row[8].nil? ? false : true
           product.supplier_id = 2027
 
           variant = Spree::Variant.new
