@@ -24,8 +24,8 @@ class ImportTiresFromEurotyre
     @green_rate = Spree::TireGreenRate.find_by_cat("B").id
     @shipping_category = Spree::ShippingCategory.where("name like '%Automovil%'").first.id
     @tax_category = Spree::TaxCategory.where("name like '%Ecotasa%'").first.id
-    @fuel_options = Hash["A", "-14-55", "B", "-13-33", "C", "-13-11", "D", "-13+11", "E", "-13+33", "F", "-13+55", "G", "-13+77"]
-    @wet_options = Hash["A", "+103-53", "B", "+103-31", "C", "+103-9", "D", "+103+13", "E", "+103+35", "F", "+103+56", "G", "+103+78"]
+    @fuel_options = Hash['A', '-14-55', 'B', '-13-33', 'C', '-13-11', 'D', '-13+11', 'E', '-13+33', 'F', '-13+55', 'G', '-13+77']
+    @wet_options = Hash['A', '+103-53', 'B', '+103-31', 'C', '+103-9', 'D', '+103+13', 'E', '+103+35', 'F', '+103+56', 'G', '+103+78']
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -197,8 +197,8 @@ class ImportTiresFromEurotyre
       end
     end
     unless no_leidos.empty?
-      headers_row = ["Ancho", "Perfil", "Llanta", "IC", "IV", "Marca", "Modelo", "Oferta", "Precio", "Stock"]
-      CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
+      headers_row = %w(Ancho Perfil Llanta IC IV Marca Modelo Oferta Precio Stock)
+      CSV.open(File.join(@directory, @send_file), 'wb', {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
@@ -208,29 +208,41 @@ class ImportTiresFromEurotyre
 
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
-    ancho = Spree::TireWidth.find_by_name(row[0])
-    if ancho.nil?
-      raise "Este ancho no existe #{row[0]}"
+    if row[0] == '0'
+      nil
     else
-      return ancho.id
+      ancho = Spree::TireWidth.find_by_name(row[0])
+      if ancho.nil?
+        raise "Este ancho no existe #{row[0]}"
+      else
+        return ancho.id
+      end
     end
   end
 
   def set_serial(row)
-    serie = Spree::TireSerial.find_by_name(row[1])
-    if serie.nil?
-      raise "Este perfil no existe #{row[1]}"
+    if row[1] == '0'
+      nil
     else
-      return serie.id
+      serie = Spree::TireSerial.find_by_name(row[1])
+      if serie.nil?
+        raise "Este perfil no existe #{row[1]}"
+      else
+        return serie.id
+      end
     end
   end
 
   def set_innertube(row)
-    llanta = Spree::TireInnertube.find_by_name(row[2])
-    if llanta.nil?
-      raise "Esta llanta no existe #{row[2]}"
+    if row[2] == '0'
+      nil
     else
-      return llanta.id
+      llanta = Spree::TireInnertube.find_by_name(row[2])
+      if llanta.nil?
+        raise "Esta llanta no existe #{row[2]}"
+      else
+        return llanta.id
+      end
     end
   end
 
