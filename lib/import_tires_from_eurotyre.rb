@@ -51,30 +51,30 @@ class ImportTiresFromEurotyre
   end
 
   def read_from_eurotyre
-    str = "http://www.eurotyre.pt/shop/shop"
+    str = 'http://www.eurotyre.pt/shop/shop'
     page = @agent.get(str)
     ruedas = []
     eco = []
     form = page.form('search')
-    select_list = form.field_with(:name => "u_marca")
-    list = form.field_with(:name => "u_marca").options
+    select_list = form.field_with(:name => 'u_marca')
+    list = form.field_with(:name => 'u_marca').options
     list.each do |marca|
       select_list.value = [marca]
       puts "Leyendo #{marca}" unless Rails.env.production?
       page2 = form.submit
       page2.search(".//table[@id='product_list']//tbody//tr").each do |d|
         for i in 0..(@num_columns - 1)
-          ruedas << d.search(".//td")[i].text
+          ruedas << d.search('.//td')[i].text
         end
         d.search(".//td[@class='etiqueta']").each do |p|
-          eco << p.search(".//span").text
+          eco << p.search('.//span').text
         end
       end
       for i in 0..((ruedas.count/@num_columns) - 1)
         @total << [ruedas[i*@num_columns], ruedas[i*@num_columns + 1], ruedas[i*@num_columns + 2],
                   ruedas[i*@num_columns + 3], ruedas[i*@num_columns + 4], ruedas[i*@num_columns + 5],
                   ruedas[i*@num_columns + 6], ruedas[i*@num_columns + 7], ruedas[i*@num_columns + 8],
-                  ruedas[i*@num_columns + 9].gsub(/\D/, "."), ruedas[i*@num_columns + 10], ruedas[i*@num_columns + 11], eco[i]]
+                  ruedas[i*@num_columns + 9], ruedas[i*@num_columns + 10], ruedas[i*@num_columns + 11], eco[i]]
         @readed += 1
       end
       ruedas.clear
@@ -138,16 +138,18 @@ class ImportTiresFromEurotyre
           product.supplier_id = 2027
 
           variant = Spree::Variant.new
-          if row[8].empty?
-            cost_price = (row[9].to_f * 1.21).round(1)
-            price = (row[9].to_f * 1.21 + @inc_precio).round(1)
+
+          if row[8].nil?
+            cost_price = (row[9].delete(' €').to_f * 1.21).round(1)
+            price = (row[9].delete(' €').to_f * 1.21 + @inc_precio).round(1)
           else
-            cost_price = (row[8].to_f * 1.21).round(1)
-            price = (row[8].to_f * 1.21 + @inc_precio).round(1)
+            cost_price = (row[8].delete(' €').to_f * 1.21).round(1)
+            price = (row[8].delete(' €').to_f * 1.21 + @inc_precio).round(1)
           end
+
           variant.price = product.price = price
           variant.cost_price = cost_price
-          variant.price_in_offert = (row[9].to_f * 1.21 + @inc_precio).round(1)
+          variant.price_in_offert = (row[9].delete(' €').to_f * 1.21 + @inc_precio).round(1)
 
           variant.tire_width_id = set_width(row)
           variant.tire_serial_id = set_serial(row)
@@ -187,10 +189,10 @@ class ImportTiresFromEurotyre
       rescue Exception => e
         puts "error en carga de datos #{row[6]}".white.on_red unless Rails.env.production?
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[8], row[9], row[10], e]
-        @logger.info("#{row[6]}")
+        @logger.info("#{row[6]}, #{row[0]}, #{row[1]}, #{row[2]}, #{row[3]}")
         @logger.error("#{e.class.name}: #{e.message}")
         @logger.error(e.backtrace * "\n")
-        @logger.info "================================================================================================="
+        @logger.info '=' * 50
         next
       end
     end
@@ -299,7 +301,7 @@ class ImportTiresFromEurotyre
     else
       row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
       eco = [$1,$2,$3,$4]
-      noise_wave = eco[2].to_i
+      eco[2].to_i
     end
   end
 
