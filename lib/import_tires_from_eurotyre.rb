@@ -187,7 +187,7 @@ class ImportTiresFromEurotyre
       rescue Exception => e
         puts "error en carga de datos #{row[6]}".white.on_red unless Rails.env.production?
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[8], row[9], row[10], e]
-        @logger.info("#{row[6}")
+        @logger.info("#{row[6]}")
         @logger.error("#{e.class.name}: #{e.message}")
         @logger.error(e.backtrace * "\n")
         @logger.info "================================================================================================="
