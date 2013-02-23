@@ -89,7 +89,6 @@ class ImportTiresFromGane
   def load_from_csv
     # [ancho, serie, llanta, vel, tube, marca, gr]
     result = []
-    fallos = []
     no_leidos = []
     i = j = 0
     hoy = Date.today

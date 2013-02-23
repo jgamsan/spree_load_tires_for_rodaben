@@ -3,7 +3,7 @@ require 'csv'
 
 class ImportTiresFromEurotyre
 
-  def initialize()
+  def initialize
     @agent = Mechanize.new
     @directory = "#{Rails.root}/vendor/products"
     @final = 'listado-neumaticos-eurotyre.csv'
@@ -94,12 +94,9 @@ class ImportTiresFromEurotyre
 
   def load_from_csv
     #[ancho, perfil, llanta, ic, iv, marca, modelo, foto, oferta, precio, stock, Barcelona]
-    #result = []
-    #fallos = []
     no_leidos = []
     i = j = 0
     hoy = Date.today
-    #productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
