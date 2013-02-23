@@ -6,12 +6,12 @@ class ImportTiresFromEurotyre
   def initialize()
     @agent = Mechanize.new
     @directory = "#{Rails.root}/vendor/products"
-    @final = "listado-neumaticos-eurotyre.csv"
-    @send_file = "listado-neumaticos-no-incorporados-eurotyre.csv"
+    @final = 'listado-neumaticos-eurotyre.csv'
+    @send_file = 'listado-neumaticos-no-incorporados-eurotyre.csv'
     @logger = Logger.new(File.join(@directory, 'logfile.log'))
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
-    @default_img = "default.png"
+    @default_img = 'default.png'
     @total = []
     @no_leidos = []
     @horario = []
@@ -26,6 +26,7 @@ class ImportTiresFromEurotyre
     @tax_category = Spree::TaxCategory.where("name like '%Ecotasa%'").first.id
     @fuel_options = Hash['A', '-14-55', 'B', '-13-33', 'C', '-13-11', 'D', '-13+11', 'E', '-13+33', 'F', '-13+55', 'G', '-13+77']
     @wet_options = Hash['A', '+103-53', 'B', '+103-31', 'C', '+103-9', 'D', '+103+13', 'E', '+103+35', 'F', '+103+56', 'G', '+103+78']
+    @headers_row = %w(Ancho Perfil Llanta IC IV Marca Modelo Oferta Precio Stock)
     #t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     #@marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     #@taxons = Hash[*t]
@@ -93,12 +94,12 @@ class ImportTiresFromEurotyre
 
   def load_from_csv
     #[ancho, perfil, llanta, ic, iv, marca, modelo, foto, oferta, precio, stock, Barcelona]
-    result = []
-    fallos = []
+    #result = []
+    #fallos = []
     no_leidos = []
     i = j = 0
     hoy = Date.today
-    productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
+    #productos = Spree::Product.where(:supplier_id => 2027).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
@@ -205,8 +206,7 @@ class ImportTiresFromEurotyre
       end
     end
     unless no_leidos.empty?
-      headers_row = %w(Ancho Perfil Llanta IC IV Marca Modelo Oferta Precio Stock)
-      CSV.open(File.join(@directory, @send_file), 'wb', {headers: headers_row, write_headers: true}) do |row|
+      CSV.open(File.join(@directory, @send_file), 'wb', {headers: @headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
         end
