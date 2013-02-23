@@ -104,7 +104,7 @@ class ImportTiresFromEurotyre
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
           variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
           variante.product.update_column(:show_in_offert, row[8].nil? ? false : true)
-          if row[7].empty?
+          if row[8].nil?
             cost_price = (row[9].delete(' €').to_f * 1.21).round(2)
             price = (row[9].delete(' €').to_f * 1.21 + @inc_precio).round(2)
           else
