@@ -158,10 +158,18 @@ class ImportTiresFromEurotyre
           variant.tire_rf = false
           variant.tire_gr = false
           variant.tire_season = 2
-          variant.tire_fuel_consumption_id = set_fuel_consumption(row)
-          variant.tire_wet_grip_id = set_wet_grip(row)
-          variant.tire_rolling_noise_db = set_rolling_noise_db(row)
-          variant.tire_rolling_noise_wave = set_rolling_noise_wave(row)
+          if row[12].nil?
+            variant.tire_fuel_consumption_id = nil
+            variant.tire_wet_grip_id = nil
+            variant.tire_rolling_noise_db = nil
+            variant.tire_rolling_noise_wave = nil
+          else
+            variant.tire_fuel_consumption_id = set_fuel_consumption(row)
+            variant.tire_wet_grip_id = set_wet_grip(row)
+            variant.tire_rolling_noise_db = set_rolling_noise_db(row)
+            variant.tire_rolling_noise_wave = set_rolling_noise_wave(row)
+          end
+
           variant.tire_green_rate_id = @green_rate
           variant.tire_load_code_id = set_load_code(row)
           variant.count_on_hand = row[10]
@@ -280,45 +288,29 @@ class ImportTiresFromEurotyre
   end
 
   def set_fuel_consumption(row)
-    if row[12].nil?
-      nil
-    else
-      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
-      eco = [$1,$2,$3,$4]
-      fuel = Spree::TireFuelConsumption.find_by_name(eco[0])
-      fuel.id
-    end
+    row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+    eco = [$1,$2,$3,$4]
+    fuel = Spree::TireFuelConsumption.find_by_name(eco[0])
+    fuel.id
   end
 
   def set_wet_grip(row)
-    if row[12].nil?
-      nil
-    else
-      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
-      eco = [$1,$2,$3,$4]
-      wet = Spree::TireWetGrip.find_by_name(eco[1])
-      wet.id
-    end
+    row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+    eco = [$1,$2,$3,$4]
+    wet = Spree::TireWetGrip.find_by_name(eco[1])
+    wet.id
   end
 
   def set_rolling_noise_db(row)
-    if row[12].nil?
-      nil
-    else
-      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
-      eco = [$1,$2,$3,$4]
-      noise_db = eco[3].to_i
-    end
+    row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+    eco = [$1,$2,$3,$4]
+    eco[3].to_i
   end
 
   def set_rolling_noise_wave(row)
-    if row[12].nil?
-      nil
-    else
-      row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
-      eco = [$1,$2,$3,$4]
-      eco[2].to_i
-    end
+    row[12] =~ %r{([A-Z])([A-Z])(\d)(\d{2})}
+    eco = [$1,$2,$3,$4]
+    eco[2].to_i
   end
 
   def set_brand(row)
