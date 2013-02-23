@@ -3,14 +3,14 @@ require 'csv'
 
 class ImportTiresFromGane
 
-  def initialize()
+  def initialize
     @agent = Mechanize.new
     @directory = "#{Rails.root}/vendor/products"
-    @final = "listado-neumaticos-gane.csv"
-    @send_file = "listado-neumaticos-no-incorporados-gane.csv"
+    @final = 'listado-neumaticos-gane.csv'
+    @send_file = 'listado-neumaticos-no-incorporados-gane.csv'
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
-    @default_img = "default.png"
+    @default_img = 'default.png'
     @total = []
     @no_leidos = []
     @horario = []
@@ -26,7 +26,7 @@ class ImportTiresFromGane
     t = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| [x.name, x.id]}.flatten
     @marcas = Spree::Taxon.where(:parent_id => 2).order("id").map {|x| x.name}
     @taxons = Hash[*t]
-    @error = ""
+    @error = ''
     @modificaciones = %w(GOODYEAR)
     @invierno = %w(WINTER SNOW RAIN)
     I18n.locale = 'es'
@@ -43,7 +43,7 @@ class ImportTiresFromGane
   end
 
   def read_from_gane
-    str = "http://galaicoasturianadeneumaticos.distritok.com/sqlcommerce/disenos/plantilla1/seccion/Catalogo.jsp?idIdioma=&idTienda=50&cPath=61"
+    str = 'http://galaicoasturianadeneumaticos.distritok.com/sqlcommerce/disenos/plantilla1/seccion/Catalogo.jsp?idIdioma=&idTienda=50&cPath=61'
     sch = ".//table[@class='result']//tr//td[@class='result_right']//a[@title='Siguiente ']"
     links = []
     until str.empty?
@@ -56,7 +56,7 @@ class ImportTiresFromGane
         l = ti.map {|x| x[:href]}
         r = d[i].search("td//span[@class='linCat']").map {|x| x.text}
         unless r.empty?
-          if r[1] == "Consultar"
+          if r[1] == 'Consultar'
               p = k = pf = s = 0
           else
             s = r[0].to_s.strip
@@ -80,7 +80,7 @@ class ImportTiresFromGane
   end
 
   def export_to_csv
-    CSV.open(File.join(@directory, @final), "wb") do |row|
+    CSV.open(File.join(@directory, @final), 'wb') do |row|
       @total.each {|element| row << element}
       #[nombre, stock, precio, descuento, precio final]
     end
@@ -168,7 +168,7 @@ class ImportTiresFromGane
     end
     unless no_leidos.empty?
       headers_row = ["Nombre", "Stock", "Precio", "Descuento", "Precio Final", "Imagen", "Motivo"]
-      CSV.open(File.join(@directory, @send_file), "wb") do |row|
+      CSV.open(File.join(@directory, @send_file), 'wb') do |row|
         no_leidos.each {|element| row << element}
       end
     end
@@ -184,7 +184,7 @@ class ImportTiresFromGane
 
   def send_mail
     begin
-      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @directory, @send_file, "GANE").deliver
+      Spree::NotifyMailer.report_notification(@readed, @updated, @deleted, @created, @directory, @send_file, 'GANE').deliver
     rescue Exception => e
       logger.error("#{e.class.name}: #{e.message}")
       logger.error(e.backtrace * "\n")
@@ -308,8 +308,8 @@ class ImportTiresFromGane
 
   def read_taxon(rueda)
    str = rueda.split
-   if str.include?("GOODYEAR") || (str.include?("GOOD") & str.include?("YEAR"))
-    inter = ["GOOD-YEAR"]
+   if str.include?('GOODYEAR') || (str.include?('GOOD') & str.include?('YEAR'))
+    inter = ['GOOD-YEAR']
    else
     inter = str & @marcas
    end
@@ -327,7 +327,7 @@ class ImportTiresFromGane
 
   def set_width(row)
     if row[0].nil?
-      return nil
+      nil
     else
       ancho = Spree::TireWidth.find_by_name(row[0])
       if ancho.nil?
@@ -340,7 +340,7 @@ class ImportTiresFromGane
 
   def set_serial(row)
     if row[1].nil?
-      return nil
+      nil
     else
       serie = Spree::TireSerial.find_by_name(row[1])
       if serie.nil?
@@ -395,7 +395,7 @@ class ImportTiresFromGane
   end
 
   def set_brand(row)
-    marca = row[5]
+    row[5]
   end
 
   def set_stock(stock)
@@ -412,9 +412,9 @@ class ImportTiresFromGane
     f1 = catalog[3].scan(/\D+/)[0]
     unless f1.nil?
       case f1
-        when "C"
+        when 'C'
           7
-        when "CP"
+        when 'CP'
           9
         else
           6
@@ -423,7 +423,7 @@ class ImportTiresFromGane
   end
 
   def get_vel_code(str)
-    if str.include?("A")
+    if str.include?('A')
       str.scan(/[A]\d/)[0]
     else
       str.scan(/[A-Z]/)[0]
