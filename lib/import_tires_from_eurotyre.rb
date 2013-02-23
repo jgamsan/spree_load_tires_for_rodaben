@@ -103,19 +103,19 @@ class ImportTiresFromEurotyre
       begin
         if Spree::Variant.existe_tire?(row[6], row[0], row[1], row[2], row[4]) # producto existe
           variante = Spree::Variant.search_tire(row[6], row[0], row[1], row[2], row[4]).first
-          variante.product.update_column(:show_in_offert, row[8].empty? ? false : true)
+          variante.product.update_column(:show_in_offert, row[8].nil? ? false : true)
           if row[7].empty?
-            cost_price = (row[9].to_f * 1.21).round(2)
-            price = (row[9].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[9].delete(' €').to_f * 1.21).round(2)
+            price = (row[9].delete(' €').to_f * 1.21 + @inc_precio).round(2)
           else
-            cost_price = (row[8].to_f * 1.21).round(2)
-            price = (row[8].to_f * 1.21 + @inc_precio).round(2)
+            cost_price = (row[8].delete(' €').to_f * 1.21).round(2)
+            price = (row[8].delete(' €').to_f * 1.21 + @inc_precio).round(2)
           end
           variante.update_attributes(
               :price => price,
               :cost_price => cost_price,
               :count_on_hand => row[10],
-              :price_in_offert => (row[9].to_f * 1.21 + @inc_precio).round(2)
+              :price_in_offert => (row[9].delete(' €').to_f * 1.21 + @inc_precio).round(2)
           )
           if variante.images.empty?
             add_image(variante, @default_wd, @default_img)
