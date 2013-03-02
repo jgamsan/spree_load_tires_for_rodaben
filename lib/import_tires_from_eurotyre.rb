@@ -237,23 +237,11 @@ class ImportTiresFromEurotyre
   end
 
   def set_load_code(row)
-    load_code = row[3]
-    if load_code.nil?
-      nil
-    else
-      if load_code =~ %r{(\d+)(?:/|:)(\d+)}
-        g = [$1,$2]
-        result =g[0]
-      else
-        result = load_code
-      end
-      load = Spree::TireLoadCode.find_by_name(result)
-      if load.nil?
-        raise "Este Indice de carga no existe #{load_code}"
-      else
-        return load.id
-      end
-    end
+    return nil if row[3].nil?
+    row[3] =~ %r{(\d{1,3})}
+    g = [$1,$2]
+    load = Spree::TireLoadCode.find_by_name(g[0])
+    load.nil? ? raise("Este Indice de carga no existe #{load}") : load.id
   end
 
   def set_fuel_consumption(row)
