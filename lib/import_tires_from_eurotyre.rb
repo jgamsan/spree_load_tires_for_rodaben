@@ -311,17 +311,10 @@ class ImportTiresFromEurotyre
   end
 
   def set_brand(row)
-    if row[5].nil?
-      raise "Marca #{row[5]} no esta registrada"
-    else
-      if row[5].include?(" ")
-        marca = row[5].split.join('-').downcase
-      else
-        marca = row[5].downcase
-      end
-      brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
-      return brand.id
-    end
+    raise "Marca #{row[5]} no esta registrada" if row[5].nil?
+    marca = row[5].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
+    brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
+    brand.id
   end
 
   def read_file(file)
