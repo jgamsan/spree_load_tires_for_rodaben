@@ -215,25 +215,25 @@ class ImportTiresFromEurotyre
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     return nil if row[0] == '0'
     ancho = Spree::TireWidth.find_by_name(row[0])
-    ancho.nil? ? raise "Este ancho no existe #{row[0]}" : ancho.id
+    ancho.nil? ? raise("Este ancho no existe #{row[0]}") : ancho.id
   end
 
   def set_serial(row)
     return nil if row[1] == '0'
     serie = Spree::TireSerial.find_by_name(row[1])
-    serie.nil? ? raise "Este perfil no existe #{row[1]}" : serie.id
+    serie.nil? ? raise("Este perfil no existe #{row[1]}") : serie.id
   end
 
   def set_innertube(row)
     return nil if row[2] == '0'
     llanta = Spree::TireInnertube.find_by_name(row[2])
-    llanta.nil? ? raise "Esta llanta no existe #{row[2]}" : llanta.id
+    llanta.nil? ? raise("Esta llanta no existe #{row[2]}") : llanta.id
   end
 
   def set_speed_code(row)
     return nil if row[4].nil?
     vel = Spree::TireSpeedCode.find_by_name(row[4])
-    vel.nil? ? raise "Este Indice Velocidad no existe #{row[4]}" : vel.id
+    vel.nil? ? raise("Este Indice Velocidad no existe #{row[4]}") : vel.id
   end
 
   def set_load_code(row)
@@ -286,7 +286,7 @@ class ImportTiresFromEurotyre
     raise "Este neumatico no tiene Marca" if row[5].nil?
     marca = row[5].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
     brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
-    brand.nil? ? raise "Marca #{row[5]} no esta registrada" : brand.id
+    brand.nil? ? raise("Marca #{row[5]} no esta registrada") : brand.id
   end
 
   def read_file(file)
