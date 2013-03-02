@@ -308,7 +308,7 @@ class ImportTiresFromGane
   def read_taxon(rueda)
    str = rueda.split
    if str.include?('GOODYEAR') || (str.include?('GOOD') & str.include?('YEAR'))
-    inter = ['GOOD-YEAR']
+    inter = %w(GOOD-YEAR)
    else
     inter = str & @marcas
    end

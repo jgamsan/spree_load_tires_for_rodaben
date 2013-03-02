@@ -84,7 +84,7 @@ class ImportTiresFromEurotyre
   end
 
   def export_to_csv
-    CSV.open(File.join(@directory, @final), "wb") do |row|
+    CSV.open(File.join(@directory, @final), 'wb') do |row|
       @total.each do |element|
         #[ancho, perfil, llanta, ic, iv, marca, modelo, foto, oferta, precio, stock, Barcelona]
         row << element
@@ -118,7 +118,6 @@ class ImportTiresFromEurotyre
           if variante.images.empty?
             add_image(variante, @default_wd, @default_img)
           end
-          #modify_cee_label_image(variante, row) unless row[12].empty?
           @updated += 1
           if Rails.env.production?
             @logger.info "Actualizado #{row[6]}"
@@ -130,7 +129,7 @@ class ImportTiresFromEurotyre
           product = Spree::Product.new
           product.name = row[6].to_s.match(/^\d+$/).nil? ? row[6] : row[6] + "-#{row[0]}/#{row[1]}R#{row[2]}"
           product.permalink = row[6].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-          product.sku = hoy.strftime("%y%m%d%H%m") + i.to_s
+          product.sku = hoy.strftime('%y%m%d%H%m') + i.to_s
           product.available_on = hoy - 1.day
           product.show_in_offert = row[8].nil? ? false : true
           product.supplier_id = 2027
