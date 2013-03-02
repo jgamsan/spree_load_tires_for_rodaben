@@ -317,50 +317,26 @@ class ImportTiresFromGane
   end
 
   def read_tube(tube)
-    if tube.nil?
-      nil
-    else
-      @tubes.find_index(tube) + 1
-    end
+    return nil if tube.nil?
+    @tubes.find_index(tube) + 1
   end
 
   def set_width(row)
-    if row[0].nil?
-      nil
-    else
-      ancho = Spree::TireWidth.find_by_name(row[0])
-      if ancho.nil?
-        raise "Este ancho no existe #{row[0]}"
-      else
-        return ancho.id
-      end
-    end
+    return nil if row[0].nil?
+    ancho = Spree::TireWidth.find_by_name(row[0])
+    ancho.nil? ? raise("Este ancho no existe #{row[0]}") : ancho.id
   end
 
   def set_serial(row)
-    if row[1].nil?
-      nil
-    else
-      serie = Spree::TireSerial.find_by_name(row[1])
-      if serie.nil?
-        raise "Este perfil no existe #{row[1]}"
-      else
-        return serie.id
-      end
-    end
+    return nil if row[1].nil?
+    serie = Spree::TireSerial.find_by_name(row[1])
+    serie.nil? ? raise("Este perfil no existe #{row[1]}") : serie.id
   end
 
   def set_innertube(row)
-    if row[2].nil?
-      row[2]
-    else
-      llanta = Spree::TireInnertube.find_by_name(row[2])
-      if llanta.nil?
-        raise "Esta llanta no existe #{row[2]}"
-      else
-        return llanta.id
-      end
-    end
+    return nil if row[2].nil?
+    llanta = Spree::TireInnertube.find_by_name(row[2])
+    llanta.nil? ? raise("Esta llanta no existe #{row[2]}") : llanta.id
   end
 
   def set_speed_code(row)
