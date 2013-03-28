@@ -28,7 +28,7 @@ class ImportTiresOfMoto
     hoy = Date.today
     no_leidos = []
     i = j = 0
-    CSV.foreach(File.join(@directory, @file), {headers: true}) do |row|
+    CSV.foreach(File.join(@directory, @file), "r:ISO-8859-1", {headers: true}) do |row|
       begin
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
@@ -51,7 +51,7 @@ class ImportTiresOfMoto
             change_image(variante, @image_wd, row[13])
           end
           @updated += 1
-          puts "Actualizado #{row[2]}" unless Rails.env.production?
+          puts "Actualizado #{row[2]}".white.on_blue unless Rails.env.production?
         else
           i += 1
           # crear uno nuevo
@@ -83,15 +83,15 @@ class ImportTiresOfMoto
           product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(9) #cargar categoria
           product.taxons << Spree::Taxon.find(set_brand(row)) #cargar marca
+          product.master = variant
           if product.save!
-            puts "Creado articulo #{row[2]}" unless Rails.env.production?
+            puts "Creado articulo #{row[2]}".white.on_blue unless Rails.env.production?
             j += 1
           end
           add_image(variant, @image_wd, row[13])
           variant = nil
           product = nil
           @created += 1
-          puts "Created es igual a #{@created}" unless Rails.env.production?
         end
       rescue Exception => e
         no_leidos << [row[1], row[2], row[8], row[12], row[17], row[19], row[21], row[23], e]
@@ -119,58 +119,27 @@ class ImportTiresOfMoto
 
   def set_width(row)
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
-    if row[17].nil?
-      nil
-    else
-      ancho = Spree::TireWidth.find_by_name(row[17])
-      if ancho.nil?
-        raise "Este ancho no existe #{row[17]}"
-      else
-        return ancho.id
-      end
-    end
-
+    return nil if row[17].nil?
+    ancho = Spree::TireWidth.find_by_name(row[17])
+    ancho.nil? ? raise "Este ancho no existe #{row[17]}" : ancho.id
   end
 
   def set_serial(row)
-    if row[19].nil?
-      nil
-    else
-      serie = Spree::TireSerial.find_by_name(row[19])
-      if serie.nil?
-        raise "Este perfil no existe #{row[19]}"
-      else
-        return serie.id
-      end
-    end
-
+    return nil if row[19].nil? 
+    serie = Spree::TireSerial.find_by_name(row[19])
+    serie.nil? ? raise "Este perfil no existe #{row[19]}" : serie.id
   end
 
   def set_innertube(row)
-    if row[21].nil?
-      nil
-    else
-      llanta = Spree::TireInnertube.find_by_name(row[21])
-      if llanta.nil?
-        raise "Esta llanta no existe #{row[21]}"
-      else
-        return llanta.id
-      end
-    end
-
+    return nil if row[21].nil?
+    llanta = Spree::TireInnertube.find_by_name(row[21])
+    llanta.nil? ? raise "Esta llanta no existe #{row[21]}" : llanta.id
   end
 
   def set_speed_code(row)
-    if row[23].nil?
-      nil
-    else
-      vel = Spree::TireSpeedCode.find_by_name(row[23])
-      if vel.nil?
-        raise "Este Indice Velocidad no existe #{row[23]}"
-      else
-        return vel.id
-      end
-    end
+    return nil if row[23].nil?
+    vel = Spree::TireSpeedCode.find_by_name(row[23])
+    vel.nil? ? raise "Este Indice Velocidad no existe #{row[23]}" : vel.id
   end
 
   def set_brand(row)
@@ -205,39 +174,26 @@ class ImportTiresOfMoto
   end
 
   def set_load_code(row)
-    if row[22].nil?
-      nil
-    else
-      load_code = Spree::TireLoadCode.find_by_name(row[22])
-      if load_code.nil?
-        raise "Este Indice de Carga no existe #{row[22]}"
-      else
-        return load_code.id
-      end
-    end
+    return nil if row[22].nil?
+    load_code = Spree::TireLoadCode.find_by_name(row[22])
+    load_code.nil? ? raise "Este Indice de Carga no existe #{row[22]}" : load_code.id
   end
 
   def set_position(row)
-    if row[24].nil?
-      3
-    else
-      case row[24]
-        when "F"
-          1
-        when "R"
-          2
-        else
-          3
-      end
+    return 3 if row[24].nil?
+    case row[24]
+      when "F"
+        1
+      when "R"
+        2
+      else
+        3
     end
   end
 
   def set_rf(row)
-    if row[25].nil?
-      nil
-    else
-      @tubes.index(row[25]) + 1
-    end
+    return nil if row[25].nil?
+    @tubes.index(row[25]) + 1
   end
 
 end
