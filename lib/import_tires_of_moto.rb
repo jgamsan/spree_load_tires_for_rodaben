@@ -121,7 +121,7 @@ class ImportTiresOfMoto
     #[ancho, perfil, llanta, ic, iv, marca, modelo, oferta, precio, PVP, stock]
     return nil if row[17].nil?
     ancho = Spree::TireWidth.find_by_name(row[17])
-    ancho.nil? ? raise "Este ancho no existe #{row[17]}" : ancho.id
+    ancho.nil? ? raise("Este ancho no existe #{row[17]}") : ancho.id
   end
 
   def set_serial(row)
