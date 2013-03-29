@@ -28,7 +28,7 @@ class ImportTiresOfMoto
     hoy = Date.today
     no_leidos = []
     i = j = 0
-    CSV.foreach(File.join(@directory, @file), "r:ISO-8859-1", {headers: true}) do |row|
+    CSV.foreach(File.join(@directory, @file), encoding: "ISO-8859-1", headers: true,  col_sep: ';') do |row|
       begin
         if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
           variante = Spree::Variant.search_moto_tire(row[1])
