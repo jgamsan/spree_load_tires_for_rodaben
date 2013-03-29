@@ -8,6 +8,7 @@ class ImportTiresOfMoto
     @file = "datos.csv"
     @image_wd = "#{Rails.root}/vendor/products/images/pic/"
     @send_file = "listado-neumaticos-no-incorporados-moto.csv"
+    @logger = Logger.new(File.join(@directory, 'logfile.log'))
     @created = 0
     @updated = 0
     @deleted = 0
@@ -61,13 +62,17 @@ class ImportTiresOfMoto
           product.sku = row[1]
           product.available_on = hoy - 1.day
           product.supplier_id = 2028
+          
+          product.show_in_offert = false
           cost_price = price = row[12].strip.gsub(/,/, '.').to_f
+          
           variant = Spree::Variant.new
+          
           variant.price = price
           variant.cost_price = price
           variant.count_on_hand = 6
           variant.price_in_offert = price
-          variant.show_in_offert = false
+          
           variant.tire_width_id = set_width(row)
           variant.tire_serial_id = set_serial(row)
           variant.tire_innertube_id = set_innertube(row)
@@ -95,6 +100,10 @@ class ImportTiresOfMoto
         end
       rescue Exception => e
         no_leidos << [row[1], row[2], row[8], row[12], row[17], row[19], row[21], row[23], e]
+        @logger.info("#{row[6]}, #{row[0]}, #{row[1]}, #{row[2]}, #{row[3]}")
+        @logger.error("#{e.class.name}: #{e.message}")
+        @logger.error(e.backtrace * "\n")
+        @logger.info '=' * 50
         next
       end
     end
