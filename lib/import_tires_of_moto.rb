@@ -127,19 +127,19 @@ class ImportTiresOfMoto
   def set_serial(row)
     return nil if row[19].nil? 
     serie = Spree::TireSerial.find_by_name(row[19])
-    serie.nil? ? raise "Este perfil no existe #{row[19]}" : serie.id
+    serie.nil? ? raise("Este perfil no existe #{row[19]}") : serie.id
   end
 
   def set_innertube(row)
     return nil if row[21].nil?
     llanta = Spree::TireInnertube.find_by_name(row[21])
-    llanta.nil? ? raise "Esta llanta no existe #{row[21]}" : llanta.id
+    llanta.nil? ? raise("Esta llanta no existe #{row[21]}") : llanta.id
   end
 
   def set_speed_code(row)
     return nil if row[23].nil?
     vel = Spree::TireSpeedCode.find_by_name(row[23])
-    vel.nil? ? raise "Este Indice Velocidad no existe #{row[23]}" : vel.id
+    vel.nil? ? raise("Este Indice Velocidad no existe #{row[23]}") : vel.id
   end
 
   def set_brand(row)
@@ -153,7 +153,7 @@ class ImportTiresOfMoto
       end
       brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
       if brand.nil?
-        raise "Marca #{row[8]} no esta registrada"
+        raise("Marca #{row[8]} no esta registrada")
       else
         return brand.id
       end
@@ -176,7 +176,7 @@ class ImportTiresOfMoto
   def set_load_code(row)
     return nil if row[22].nil?
     load_code = Spree::TireLoadCode.find_by_name(row[22])
-    load_code.nil? ? raise "Este Indice de Carga no existe #{row[22]}" : load_code.id
+    load_code.nil? ? raise("Este Indice de Carga no existe #{row[22]}") : load_code.id
   end
 
   def set_position(row)
