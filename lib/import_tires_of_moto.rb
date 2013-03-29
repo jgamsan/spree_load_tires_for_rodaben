@@ -48,7 +48,6 @@ class ImportTiresOfMoto
                   )
           if variante.images.empty?
             add_image(variante, @image_wd, row[13]) unless row[13].nil?              
-            end
           elsif variante.images.first.attachment_file_name != row[13]
             change_image(variante, @image_wd, row[13])
           end
