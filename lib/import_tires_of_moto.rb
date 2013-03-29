@@ -47,7 +47,8 @@ class ImportTiresOfMoto
                   :tire_rolling_noise_wave => nil
                   )
           if variante.images.empty?
-            add_image(variante, @image_wd, row[13])
+            add_image(variante, @image_wd, row[13]) unless row[13].nil?              
+            end
           elsif variante.images.first.attachment_file_name != row[13]
             change_image(variante, @image_wd, row[13])
           end
@@ -93,7 +94,7 @@ class ImportTiresOfMoto
             puts "Creado articulo #{row[2]}".white.on_blue unless Rails.env.production?
             j += 1
           end
-          add_image(variant, @image_wd, row[13])
+          add_image(variant, @image_wd, row[13]) unless row[13].nil?
           variant = nil
           product = nil
           @created += 1
