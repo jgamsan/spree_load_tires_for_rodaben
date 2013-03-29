@@ -48,7 +48,7 @@ class ImportTiresOfMoto
                   )
           if variante.images.empty?
             add_image(variante, @image_wd, row[13])
-          elsif product.images.first.attachment_file_name != row[13]
+          elsif variante.images.first.attachment_file_name != row[13]
             change_image(variante, @image_wd, row[13])
           end
           @updated += 1
