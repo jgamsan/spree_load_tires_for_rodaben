@@ -155,7 +155,7 @@ class ImportTiresFromEurotyre
           variant.tire_rf = false
           variant.tire_gr = false
           variant.tire_season = 2
-          if row[12].nil?
+          if row[12].blank?
             variant.tire_fuel_consumption_id = nil
             variant.tire_wet_grip_id = nil
             variant.tire_rolling_noise_db = nil
