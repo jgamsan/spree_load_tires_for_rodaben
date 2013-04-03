@@ -135,7 +135,7 @@ class ImportTiresFromGane
             variant.tire_gr = result[6]
             variant.tire_season = set_season(row[0])
             variant.tire_green_rate_id = @green_rate
-            variant.tire_load_code_id = set_load_code(row)
+            variant.tire_load_code_id = nil
             variant.tire_fuel_consumption_id = nil
             variant.tire_wet_grip_id = nil
             variant.tire_rolling_noise_db = nil
