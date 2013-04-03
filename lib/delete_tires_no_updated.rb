@@ -13,10 +13,10 @@ class DeleteTiresNoUpdated
   end
 
   def delete_tires
-    @delete_in_eurotyre = Spree::Product.where('updated_at < ? and supplier_id = ?', Date.yesterday, 2027)
+    @delete_in_eurotyre = Spree::Product.where('updated_at < ? and supplier_id = ?', (Date.yesterday - 1), 2027)
     @total_eurotyre = @delete_in_eurotyre.count
     @delete_in_eurotyre.destroy_all
-    @delete_in_gane = Spree::Product.where('updated_at < ? and supplier_id = ?', Date.yesterday, 1045)
+    @delete_in_gane = Spree::Product.where('updated_at < ? and supplier_id = ?', (Date.yesterday - 1), 1045)
     @total_gane = @delete_in_gane.count
     @delete_in_gane.destroy_all
   end
