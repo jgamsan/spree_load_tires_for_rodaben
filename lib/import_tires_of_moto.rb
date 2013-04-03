@@ -41,6 +41,7 @@ class ImportTiresOfMoto
                   :tire_load_code_id => set_load_code(row),
                   :tire_position => set_position(row),
                   :tire_rf => set_rf(row),
+                  :tire_green_rate_id => set_green_rate(row),
                   :tire_fuel_consumption_id => nil,
                   :tire_wet_grip_id => nil,
                   :tire_rolling_noise_db => nil,
@@ -80,7 +81,7 @@ class ImportTiresOfMoto
           variant.tire_speed_code_id = set_speed_code(row)
           variant.tire_position = set_position(row)
           variant.tire_rf = set_rf(row)
-          variant.tire_green_rate_id = 1
+          variant.tire_green_rate_id = set_green_rate(row)
           variant.tire_fuel_consumption_id = nil
           variant.tire_wet_grip_id = nil
           variant.tire_rolling_noise_db = nil
@@ -203,6 +204,12 @@ class ImportTiresOfMoto
   def set_rf(row)
     return nil if row[25].nil?
     @tubes.index(row[25]) + 1
+  end
+
+  def set_green_rate(row)
+    return nil if row[10].nil?
+    eco = Spree::TireGreenRate.find_by_amount(row[10].strip.gsub(/,/, '.').to_f)
+    eco.nil? ? raise("Esta Ecotasa no existe #{row[10]}") : eco.id
   end
 
 end
