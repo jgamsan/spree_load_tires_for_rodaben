@@ -14,8 +14,7 @@ class ImportTiresOfMoto
     @deleted = 0
     @readed = 0
     @total = []
-    @tubes = %w(TL TT RU)
-    @green_rate = Spree::TireGreenRate.find_by_cat("A").id
+    @tubes = %w(TL TT RU TL/TT)
     @shipping_category = Spree::ShippingCategory.where("name like '%Motos%'").first.id
     I18n.locale = 'es'
   end

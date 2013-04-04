@@ -19,6 +19,7 @@ class ImportTiresFromGane
     @deleted = 0
     @readed = 0
     @inc_precio = 9.95
+    @logger = Logger.new(File.join(@directory, 'logfile-gane.log'))
     @tubes = %w(TL TT RU)
     @green_rate = Spree::TireGreenRate.find_by_cat("B").id
     @shipping_category = Spree::ShippingCategory.where("name like '%Automovil%'").first.id
@@ -162,6 +163,10 @@ class ImportTiresFromGane
         end
       rescue Exception => e
         no_leidos << [row[0], row[1], row[2], row[3], row[4], row[5], e]
+        @logger.info("#{row[0]}, #{row[1]}, #{row[2]}, #{row[3]}, #{row[4]}, #{row[5]}")
+        @logger.error("#{e.class.name}: #{e.message}")
+        @logger.error(e.backtrace * "\n")
+        @logger.info '=' * 50
         next
       end
     end
