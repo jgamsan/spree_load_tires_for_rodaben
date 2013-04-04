@@ -93,12 +93,15 @@ class ImportTiresFromGane
     no_leidos = []
     i = j = 0
     hoy = Date.today
-    productos = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
+    #productos = Spree::Product.where(:supplier_id => 1045).map {|x| x.name}.flatten
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         unless row[0].blank?
-          if productos.include?(row[0]) # producto existe
-            articulo = Spree::Product.find_by_name(row[0])
+          plink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
+          articulo = Spree::Product.find_by_permalink(plink)
+          if !articulo.nil?
+          #if productos.include?(row[0]) # producto existe
+            #articulo = Spree::Product.find_by_permalink()
             articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
             cost_price = row[2].to_f * 1.21
@@ -125,9 +128,9 @@ class ImportTiresFromGane
 
             variant = Spree::Variant.new
 
-            variant.price = (row[4].to_f * 1.21 + @inc_precio).round(1) #falta de poner el precio de venta segun cliente
+            variant.price = (row[4].to_f * 1.21 + @inc_precio).round(2) #falta de poner el precio de venta segun cliente
             variant.cost_price = row[4].to_f * 1.21
-            variant.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(1)
+            variant.price_in_offert = (row[2].to_f * 1.21 + @inc_precio).round(2)
 
             variant.tire_width_id = set_width(result)
             variant.tire_serial_id = set_serial(result)
@@ -146,6 +149,8 @@ class ImportTiresFromGane
             product.shipping_category_id = @shipping_category
             product.taxons << Spree::Taxon.find(result[6]) #cargar categoria
             product.taxons << Spree::Taxon.find(set_brand(result)) #cargar marca
+
+            product.master = variant
 
             if product.save!
               puts "Creado articulo #{row[0]}" unless Rails.env.production?
