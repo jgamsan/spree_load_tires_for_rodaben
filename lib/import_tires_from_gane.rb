@@ -98,10 +98,10 @@ class ImportTiresFromGane
       begin
         unless row[0].blank?
           plink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-          articulo = Spree::Product.find_by_permalink(plink)
-          if !articulo.nil?
-          #if productos.include?(row[0]) # producto existe
-            #articulo = Spree::Product.find_by_permalink()
+          #articulo = Spree::Product.find_by_permalink(plink)
+          #if !articulo.nil?
+          if productos.include?(plink) # producto existe
+            articulo = Spree::Product.find_by_permalink()
             articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
             cost_price = row[2].to_f * 1.21
