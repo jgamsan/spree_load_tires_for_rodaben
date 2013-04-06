@@ -47,7 +47,7 @@ class ImportTiresOfMoto
                   :tire_rolling_noise_wave => nil
                   )
           if variante.images.empty?
-            add_image(variante, @image_wd, row[13]) unless row[13].nil?              
+            add_image(variante, @image_wd, row[13]) unless row[13].nil?
           elsif variante.images.first.attachment_file_name != row[13]
             change_image(variante, @image_wd, row[13])
           end
@@ -59,20 +59,20 @@ class ImportTiresOfMoto
           product = Spree::Product.new
           product.name = row[2] + (row[16].nil? ? "" : row[16])
           product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-          product.sku = row[1]
+
           product.available_on = hoy - 1.day
           product.supplier_id = 2028
-          
+
           product.show_in_offert = false
           cost_price = price = row[12].strip.gsub(/,/, '.').to_f
-          
+
           variant = Spree::Variant.new
-          
+
           variant.price = price
           variant.cost_price = price
           variant.count_on_hand = 6
           variant.price_in_offert = price
-          
+          variant.sku = row[1]
           variant.tire_width_id = set_width(row)
           variant.tire_serial_id = set_serial(row)
           variant.tire_innertube_id = set_innertube(row)
@@ -134,7 +134,7 @@ class ImportTiresOfMoto
   end
 
   def set_serial(row)
-    return nil if row[19].nil? 
+    return nil if row[19].nil?
     serie = Spree::TireSerial.find_by_name(row[19])
     serie.nil? ? raise("Este perfil no existe #{row[19]}") : serie.id
   end
