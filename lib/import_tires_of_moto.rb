@@ -28,29 +28,29 @@ class ImportTiresOfMoto
     hoy = Date.today
     no_leidos = []
     i = j = 0
+    total = Spree::Product.includes(:master).where(:supplier_id => 2028).map {|x| x.master.sku}
     CSV.foreach(File.join(@directory, @file), encoding: "ISO-8859-1", headers: true,  col_sep: ';') do |row|
       begin
-        if Spree::Variant.existe_moto_tire(row[1]) #buscar por SKU
-          variante = Spree::Variant.search_moto_tire(row[1])
-          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
+        if total.include?(row[0]
+          variante = Spree::Variant.search_moto_tire(row[0])
+          producto = Spree::Product.find(variante.product_id)
+          product.update_attributes(:name => (row[2] + (row[16].nil? ? "" : row[16])))
+          price = row[12].strip.gsub(/,/, '.').to_f
           variante.update_attributes(
                   :price_in_offert => price,
                   :price => price,
-                  :cost_price => cost_price,
+                  :cost_price => price,
                   :tire_load_code_id => set_load_code(row),
                   :tire_position => set_position(row),
                   :tire_rf => set_rf(row),
-                  :tire_green_rate_id => set_green_rate(row),
-                  :tire_fuel_consumption_id => nil,
-                  :tire_wet_grip_id => nil,
-                  :tire_rolling_noise_db => nil,
-                  :tire_rolling_noise_wave => nil
+                  :tire_green_rate_id => set_green_rate(row)
                   )
-          if variante.images.empty?
-            add_image(variante, @image_wd, row[13]) unless row[13].nil?              
-          elsif variante.images.first.attachment_file_name != row[13]
-            change_image(variante, @image_wd, row[13])
-          end
+          check_images unless row[13].nil?
+          # if variante.images.empty?
+          #   add_image(variante, @image_wd, row[13]) unless row[13].nil?
+          # elsif variante.images.first.attachment_file_name != row[13]
+          #   change_image(variante, @image_wd, row[13])
+          # end
           @updated += 1
           puts "Actualizado #{row[2]}".white.on_blue unless Rails.env.production?
         else
@@ -59,20 +59,20 @@ class ImportTiresOfMoto
           product = Spree::Product.new
           product.name = row[2] + (row[16].nil? ? "" : row[16])
           product.permalink = product.name.downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-          product.sku = row[1]
+
           product.available_on = hoy - 1.day
           product.supplier_id = 2028
-          
+
           product.show_in_offert = false
-          cost_price = price = row[12].strip.gsub(/,/, '.').to_f
-          
+          price = row[12].strip.gsub(/,/, '.').to_f
+
           variant = Spree::Variant.new
-          
+
           variant.price = price
           variant.cost_price = price
           variant.count_on_hand = 6
           variant.price_in_offert = price
-          
+          variant.sku = row[0]
           variant.tire_width_id = set_width(row)
           variant.tire_serial_id = set_serial(row)
           variant.tire_innertube_id = set_innertube(row)
@@ -134,7 +134,7 @@ class ImportTiresOfMoto
   end
 
   def set_serial(row)
-    return nil if row[19].nil? 
+    return nil if row[19].nil?
     serie = Spree::TireSerial.find_by_name(row[19])
     serie.nil? ? raise("Este perfil no existe #{row[19]}") : serie.id
   end
@@ -180,6 +180,14 @@ class ImportTiresOfMoto
   def change_image(variant, dir, file)
     variant.images.delete_all
     add_image(variant, dir, file)
+  end
+
+  def check_images(variant, dir. file)
+    if variante.images.first.nil?
+      add_image(variant, dir, file)
+    else
+      change_image(variant, dir, file) unless variant.images.first.attachment_file_name = row[13]
+    end
   end
 
   def set_load_code(row)

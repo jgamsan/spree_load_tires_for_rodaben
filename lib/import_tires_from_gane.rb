@@ -93,12 +93,13 @@ class ImportTiresFromGane
     no_leidos = []
     i = j = 0
     hoy = Date.today
+    total = Spree::Product.where(:supplier_id => 1045).map {|x| x.permalink}
     CSV.foreach(File.join(@directory, @final)) do |row|
       begin
         unless row[0].blank?
           plink = row[0].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
-          articulo = Spree::Product.find_by_permalink(plink)
-          if !articulo.nil?
+          if total.include?(plink) # producto existe
+            articulo = Spree::Product.find_by_permalink(plink)
             articulo.update_column(:show_in_offert, row[3].to_f > 0 ? true : false)
             variante = Spree::Variant.find_by_product_id(articulo.id)
             cost_price = row[2].to_f * 1.21
