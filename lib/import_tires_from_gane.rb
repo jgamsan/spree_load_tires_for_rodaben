@@ -35,7 +35,7 @@ class ImportTiresFromGane
 
   def run
     if login
-      puts "Logueado en Gane correctamente"
+      puts "Logueado en Gane correctamente" unless Rails.env.production?
       read_from_gane
       export_to_csv
       load_from_csv
@@ -309,7 +309,7 @@ class ImportTiresFromGane
       marca = read_taxon(rueda)
       [ancho, serie, llanta, vel, tube, marca, 6]
     else
-      puts "No leido #{rueda}"
+      puts "No leido #{rueda}" unless Rails.env.production?
     end
   end
 
