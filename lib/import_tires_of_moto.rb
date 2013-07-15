@@ -5,9 +5,9 @@ class ImportTiresOfMoto
 
   def initialize()
     @directory = "#{Rails.root}/vendor/products"
-    @file = "datos.csv"
+    @file = 'datos.csv'
     @image_wd = "#{Rails.root}/vendor/products/images/pic/"
-    @send_file = "listado-neumaticos-no-incorporados-moto.csv"
+    @send_file = 'listado-neumaticos-no-incorporados-moto.csv'
     @logger = Logger.new(File.join(@directory, 'logfile.log'))
     @created = 0
     @updated = 0
@@ -34,7 +34,7 @@ class ImportTiresOfMoto
         if total.include?(row[0])
           variante = Spree::Variant.search_moto_tire(row[0])
           producto = Spree::Product.find(variante.product_id)
-          product.update_attributes(:name => (row[2] + (row[16].nil? ? "" : row[16])))
+          producto.update_attributes(:name => (row[2] + (row[16].nil? ? '' : row[16])))
           price = row[12].strip.gsub(/,/, '.').to_f
           variante.update_attributes(
                   :price_in_offert => price,
@@ -45,7 +45,7 @@ class ImportTiresOfMoto
                   :tire_rf => set_rf(row),
                   :tire_green_rate_id => set_green_rate(row)
                   )
-          check_images unless row[13].nil?
+          check_images(variante, @image_wd, row[13]) unless row[13].nil?
           # if variante.images.empty?
           #   add_image(variante, @image_wd, row[13]) unless row[13].nil?
           # elsif variante.images.first.attachment_file_name != row[13]
@@ -108,7 +108,7 @@ class ImportTiresOfMoto
       end
     end
     unless no_leidos.empty?
-      headers_row = ["SKU", "Nombre", "Marca", "Precio", "Ancho", "Perfil", "Llanta", "IV", "Error"]
+      headers_row = %w(SKU Nombre Marca Precio Ancho Perfil Llanta IV Error)
       CSV.open(File.join(@directory, @send_file), "wb", {headers: headers_row, write_headers: true}) do |row|
         no_leidos.each do |element|
           row << element
@@ -153,9 +153,9 @@ class ImportTiresOfMoto
 
   def set_brand(row)
     if row[8].nil?
-      raise "Sin Marca"
+      raise 'Sin Marca'
     else
-      if row[8].include?(" ")
+      if row[8].include?(' ')
         marca = row[8].split.join('-').downcase
       else
         marca = row[8].downcase
@@ -183,7 +183,7 @@ class ImportTiresOfMoto
   end
 
   def check_images(variant, dir, file)
-    if variante.images.first.nil?
+    if variant.images.first.nil?
       add_image(variant, dir, file)
     else
       change_image(variant, dir, file) unless variant.images.first.attachment_file_name = row[13]
@@ -199,9 +199,9 @@ class ImportTiresOfMoto
   def set_position(row)
     return 3 if row[24].nil?
     case row[24]
-      when "F"
+      when 'F'
         1
-      when "R"
+      when 'R'
         2
       else
         3
