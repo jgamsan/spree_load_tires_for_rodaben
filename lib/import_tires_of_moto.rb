@@ -182,7 +182,7 @@ class ImportTiresOfMoto
     add_image(variant, dir, file)
   end
 
-  def check_images(variant, dir. file)
+  def check_images(variant, dir, file)
     if variante.images.first.nil?
       add_image(variant, dir, file)
     else
