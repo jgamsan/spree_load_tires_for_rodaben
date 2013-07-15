@@ -31,7 +31,7 @@ class ImportTiresOfMoto
     total = Spree::Product.includes(:master).where(:supplier_id => 2028).map {|x| x.master.sku}
     CSV.foreach(File.join(@directory, @file), encoding: "ISO-8859-1", headers: true,  col_sep: ';') do |row|
       begin
-        if total.include?(row[0]
+        if total.include?(row[0])
           variante = Spree::Variant.search_moto_tire(row[0])
           producto = Spree::Product.find(variante.product_id)
           product.update_attributes(:name => (row[2] + (row[16].nil? ? "" : row[16])))
