@@ -48,4 +48,10 @@ namespace :products do
     AddImagesToOrphanVariants.new.run
   end
 
+  desc 'Change SKU row in motos'
+  task :change_sku => :environment do
+    require 'change_sku'
+    ChangeSku.new.run
+  end
+
 end
