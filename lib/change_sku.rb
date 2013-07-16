@@ -18,6 +18,7 @@ class ChangeSku
       begin
         v = Spree::Variant.find_by_sku(row[1])
         v.update_attributes(:sku => row[0])
+        puts "Actualizado articulo #{row[0]}".white.on_blue unless Rails.env.production?
       rescue Exception => e
         @logger.error("#{e.class.name}: #{e.message}")
         @logger.error(e.backtrace * "\n")
