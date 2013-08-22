@@ -170,7 +170,7 @@ class ImportTiresFromEurotyre
 
           variant.tire_green_rate_id = @green_rate
           variant.tire_load_code_id = set_load_code(row)
-          variant.count_on_hand = row[10]
+          variant.count_on_hand = set_stock(row[10])
           product.tax_category_id = @tax_category
           product.shipping_category_id = @shipping_category
           product.taxons << Spree::Taxon.find(4) #cargar categoria
@@ -275,6 +275,16 @@ class ImportTiresFromEurotyre
     marca = row[5].downcase.gsub(/\s+/, '-').gsub(/[^a-zA-Z0-9_]+/, '-')
     brand = Spree::Taxon.find_by_permalink("marcas/#{marca}")
     brand.nil? ? raise("Marca #{row[5]} no esta registrada") : brand.id
+  end
+
+  def set_stock(stock)
+    if stock.include?("<")
+      stock.delete("<").scan(/\d+/)[0].to_i - 1
+    elsif stock.include?(">")
+      stock.delete(">").scan(/\d+/)[0].to_i
+    else
+      stock.to_i
+    end
   end
 
   def read_file(file)
