@@ -8,7 +8,8 @@ class ImportTiresFromEurotyre
     @directory = "#{Rails.root}/vendor/products"
     @final = 'listado-neumaticos-eurotyre.csv'
     @send_file = 'listado-neumaticos-no-incorporados-eurotyre.csv'
-    @logger = Logger.new(File.join(@directory, 'logfile.log'))
+    @name = Time.now.strftime('%Y%m%d%H%M') + 'EURO' + '.log'
+    @logger = Logger.new(File.join(@directory, @name))
     @image_wd = "#{Rails.root}/vendor/products/images/"
     @default_wd = "#{Rails.root}/app/assets/images/"
     @default_img = 'default.png'
