@@ -280,13 +280,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_stock(stock)
-    if stock.include?("<")
-      stock.delete("<").scan(/\d+/)[0].to_i - 1
-    elsif stock.include?(">")
-      stock.delete(">").scan(/\d+/)[0].to_i
-    else
-      stock.to_i
-    end
+    stock.delete('<' '>').to_i
   end
 
   def read_file(file)
