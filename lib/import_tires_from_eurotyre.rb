@@ -182,12 +182,14 @@ class ImportTiresFromEurotyre
             if Rails.env.production?
               @logger.info "Creado articulo #{row[6]}"
             else
-              puts "Creado articulo #{row[6]}".white.on_blue
+              puts "Creado Producto #{row[6]}".white.on_blue
+              if variant.save!
+                add_image(variant, @default_wd, @default_img)
+                modify_cee_label_image(variant, row) unless row[12].blank?
+              end  
             end
             j += 1
           end
-          add_image(variant, @default_wd, @default_img)
-          modify_cee_label_image(variant, row) unless row[12].nil?
           variant = nil
           product = nil
           @created += 1
