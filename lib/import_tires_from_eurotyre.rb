@@ -186,7 +186,7 @@ class ImportTiresFromEurotyre
               if variant.save!
                 add_image(variant, @default_wd, @default_img)
                 modify_cee_label_image(variant, row) unless row[12].blank?
-              end  
+              end
             end
             j += 1
           end
@@ -239,7 +239,7 @@ class ImportTiresFromEurotyre
   end
 
   def set_load_code(row)
-    return nil if row[3].nil?
+    return nil if row[3].blank?
     row[3] =~ %r{(\d{1,3})}
     g = [$1,$2]
     load = Spree::TireLoadCode.find_by_name(g[0])
